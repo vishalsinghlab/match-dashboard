@@ -1,42 +1,43 @@
 @if (!isLoginPage()) {
-  <header class="app-header">
-    <div class="header-container">
-      <div class="brand-group">
-        <a routerLink="/matches" class="brand-logo">
-          <div class="logo-mark">
-            <span class="dot-live-pulse"></span>
-          </div>
-          <span class="brand-name">MATCH ENGINE</span>
-          <span class="brand-version">v2.4</span>
+<header class="app-header">
+  <div class="header-container">
+    <div class="brand-group">
+      <a routerLink="/matches" class="brand-logo">
+        <div class="logo-mark">
+          <span class="dot-live-pulse"></span>
+        </div>
+        <span class="brand-name">MATCH ENGINE</span>
+        <span class="brand-version">v2.4</span>
+      </a>
+
+      <nav class="main-nav">
+        <a routerLink="/matches" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
+          class="nav-link">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Live Hub</span>
         </a>
+        <a routerLink="/admin/matches" routerLinkActive="active-link" class="nav-link">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Admin Console</span>
+        </a>
+      </nav>
+    </div>
 
-        <nav class="main-nav">
-          <a routerLink="/matches" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-            <i class="fa-solid fa-trophy"></i>
-            <span>Live Hub</span>
-          </a>
-          <a routerLink="/admin/matches" routerLinkActive="active-link" class="nav-link">
-            <i class="fa-solid fa-sliders"></i>
-            <span>Admin Console</span>
-          </a>
-        </nav>
-      </div>
-
-      <div class="header-right">
-        <div class="system-status">
+    <div class="header-right">
+      <!-- <div class="system-status">
           <span class="status-dot"></span>
           <span class="status-text">Realtime Telemetry Active</span>
-        </div>
+        </div> -->
 
-        <div class="nav-divider"></div>
+      <div class="nav-divider"></div>
 
-        <button type="button" class="btn-logout" (click)="logout()" title="Sign out of workspace">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Sign Out</span>
-        </button>
-      </div>
+      <button type="button" class="btn-logout" (click)="logout()" title="Sign out of workspace">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>Sign Out</span>
+      </button>
     </div>
-  </header>
+  </div>
+</header>
 }
 
 <main class="app-main-content">

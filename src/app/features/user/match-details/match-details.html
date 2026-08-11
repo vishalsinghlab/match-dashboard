@@ -14,10 +14,12 @@
     </div>
   } @else if (errorMessage()) {
     <div class="error-panel">
-      <i class="fa-solid fa-triangle-exclamation"></i>
-      <div class="error-text">
-        <h4>Fixture Not Found</h4>
-        <p>{{ errorMessage() }}</p>
+      <div class="error-content">
+        <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+        <div class="error-text">
+          <h4>Fixture Not Found</h4>
+          <p>{{ errorMessage() }}</p>
+        </div>
       </div>
       <a routerLink="/matches" class="btn-secondary">Return to Matches Directory</a>
     </div>
