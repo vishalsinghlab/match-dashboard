@@ -1,0 +1,304 @@
+<div class="page-container">
+  <!-- Admin Console Header -->
+  <div class="page-header">
+    <div class="header-main">
+      <h1 class="page-title">Admin Control Console</h1>
+      <p class="page-subtitle">Configure, launch, and monitor live sports streaming pipelines.</p>
+    </div>
+    
+    <div class="header-actions">
+      <button type="button" class="btn-refresh-pipeline" (click)="loadMatches()" [disabled]="isRefreshing()">
+        <div class="btn-icon-wrapper" [class.is-spinning]="isRefreshing()">
+          <i class="fa-solid fa-rotate-right"></i>
+        </div>
+        <div class="btn-text-group">
+          <span class="btn-title">{{ isRefreshing() ? 'Refreshing Feed...' : 'Refresh Pipeline' }}</span>
+          <span class="btn-subtitle">Sync database records</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Elevated Metric Overview Bar -->
+  <div class="metrics-row">
+    <button type="button" class="metric-card-elevated" (click)="setFilter('ALL')" [class.is-active]="activeFilter() === 'ALL'">
+      <div class="metric-indicator-bar bar-primary"></div>
+      <div class="metric-top">
+        <span class="metric-label">Total Fixtures</span>
+        <div class="metric-icon-badge badge-neutral">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+      </div>
+      <div class="metric-body">
+        <span class="metric-val">{{ totalCount() }}</span>
+        <span class="metric-subtext">Active database records</span>
+      </div>
+    </button>
+
+    <button type="button" class="metric-card-elevated live-card" (click)="setFilter('LIVE')" [class.is-active]="activeFilter() === 'LIVE'">
+      <div class="metric-indicator-bar bar-live"></div>
+      <div class="metric-top">
+        <span class="metric-label">Live Broadcasts</span>
+        <div class="metric-icon-badge badge-live">
+          <span class="dot-live-pulse"></span>
+          <i class="fa-solid fa-tower-broadcast"></i>
+        </div>
+      </div>
+      <div class="metric-body">
+        <span class="metric-val text-live">{{ liveCount() }}</span>
+        <span class="metric-subtext">Streaming real-time feeds</span>
+      </div>
+    </button>
+
+    <button type="button" class="metric-card-elevated" (click)="setFilter('UPCOMING')" [class.is-active]="activeFilter() === 'UPCOMING'">
+      <div class="metric-indicator-bar bar-upcoming"></div>
+      <div class="metric-top">
+        <span class="metric-label">Upcoming</span>
+        <div class="metric-icon-badge badge-upcoming">
+          <i class="fa-regular fa-clock"></i>
+        </div>
+      </div>
+      <div class="metric-body">
+        <span class="metric-val text-upcoming">{{ upcomingCount() }}</span>
+        <span class="metric-subtext">Scheduled fixtures</span>
+      </div>
+    </button>
+
+    <button type="button" class="metric-card-elevated" (click)="setFilter('COMPLETED')" [class.is-active]="activeFilter() === 'COMPLETED'">
+      <div class="metric-indicator-bar bar-completed"></div>
+      <div class="metric-top">
+        <span class="metric-label">Completed</span>
+        <div class="metric-icon-badge badge-completed">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+      <div class="metric-body">
+        <span class="metric-val text-completed">{{ completedCount() }}</span>
+        <span class="metric-subtext">Archived telemetry data</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- 2-Column Operator Layout -->
+  <div class="operator-workspace">
+    <!-- Left Panel: Create Match Form -->
+    <div class="panel-card form-panel">
+      <div class="panel-head">
+        <i class="fa-solid fa-plus panel-icon"></i>
+        <div>
+          <h3>Create New Fixture</h3>
+          <p class="panel-sub">Configure feed details and launch stream</p>
+        </div>
+      </div>
+
+      <form [formGroup]="matchForm" (ngSubmit)="createMatch()" class="admin-form">
+        <div class="form-field">
+          <label for="name">Fixture Title</label>
+          <input 
+            id="name" 
+            type="text" 
+            formControlName="name" 
+            placeholder="e.g. India vs Australia - 1st T20"
+            [class.input-error]="matchForm.controls.name.touched && matchForm.controls.name.invalid"
+          />
+          @if (matchForm.controls.name.touched && matchForm.controls.name.invalid) {
+            <span class="field-error">Title is required (min 3 characters).</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="sport">Sport Type</label>
+          <input 
+            id="sport" 
+            type="text" 
+            formControlName="sport" 
+            placeholder="e.g. Cricket, Football..."
+            [class.input-error]="matchForm.controls.sport.touched && matchForm.controls.sport.invalid"
+          />
+          
+          <div class="preset-chips">
+            <span class="preset-label">Quick Select:</span>
+            @for (sportPreset of popularSports; track sportPreset) {
+              <button 
+                type="button" 
+                class="chip-item" 
+                [class.is-selected]="matchForm.controls.sport.value === sportPreset"
+                (click)="selectSportPreset(sportPreset)">
+                <i [class]="getSportIcon(sportPreset)"></i> {{ sportPreset }}
+              </button>
+            }
+          </div>
+
+          @if (matchForm.controls.sport.touched && matchForm.controls.sport.invalid) {
+            <span class="field-error">Sport category is required.</span>
+          }
+        </div>
+
+        <div class="form-row-2col">
+          <div class="form-field">
+            <label for="status">Initial Status</label>
+            <select id="status" formControlName="status">
+              <option value="UPCOMING">Upcoming</option>
+              <option value="LIVE">Live</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="startTime">Start Date & Time</label>
+            <input 
+              id="startTime" 
+              type="datetime-local" 
+              formControlName="startTime" 
+              [class.input-error]="matchForm.controls.startTime.touched && matchForm.controls.startTime.invalid"
+            />
+            @if (matchForm.controls.startTime.touched && matchForm.controls.startTime.invalid) {
+              <span class="field-error">Start time is required.</span>
+            }
+          </div>
+        </div>
+
+        <!-- WebSocket Toggle Row -->
+        <div class="toggle-row">
+          <label class="toggle-switch" for="socketEnabled">
+            <input id="socketEnabled" type="checkbox" formControlName="socketEnabled" />
+            <span class="toggle-slider"></span>
+          </label>
+          <div class="toggle-meta">
+            <span class="toggle-title">Realtime WebSocket Channel</span>
+            <span class="toggle-desc">Broadcast live scores instantly on channel <code>match:&lt;id&gt;</code></span>
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-callout">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <button type="submit" class="btn-primary-submit" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="spinner-sm"></span>
+            <span>Launching Feed...</span>
+          } @else {
+            <i class="fa-solid fa-rocket"></i>
+            <span>Launch Match Feed</span>
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Right Panel: Fixtures Pipeline Feed -->
+    <div class="panel-card feed-panel">
+      <div class="panel-head border-bottom">
+        <div class="head-left">
+          <h3>Fixtures Pipeline</h3>
+          <span class="count-badge">{{ filteredMatches().length }} registered</span>
+        </div>
+      </div>
+
+      <!-- Toolbar Search & Filter Controls -->
+      <div class="toolbar-sm">
+        <div class="search-field">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input 
+            type="text" 
+            [ngModel]="searchQuery()" 
+            (ngModelChange)="searchQuery.set($event)"
+            placeholder="Filter matches..." 
+          />
+          @if (searchQuery()) {
+            <button type="button" class="btn-clear-search" (click)="searchQuery.set('')">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          }
+        </div>
+
+        <div class="filter-group">
+          <button 
+            type="button" 
+            class="filter-tab" 
+            [class.is-active]="activeFilter() === 'ALL'"
+            (click)="setFilter('ALL')">
+            All
+          </button>
+          <button 
+            type="button" 
+            class="filter-tab live-tab" 
+            [class.is-active]="activeFilter() === 'LIVE'"
+            (click)="setFilter('LIVE')">
+            Live
+          </button>
+          <button 
+            type="button" 
+            class="filter-tab" 
+            [class.is-active]="activeFilter() === 'UPCOMING'"
+            (click)="setFilter('UPCOMING')">
+            Upcoming
+          </button>
+          <button 
+            type="button" 
+            class="filter-tab" 
+            [class.is-active]="activeFilter() === 'COMPLETED'"
+            (click)="setFilter('COMPLETED')">
+            Done
+          </button>
+        </div>
+      </div>
+
+      <!-- Pipeline List Items -->
+      @if (isLoading()) {
+        <div class="state-container-sm">
+          <div class="loading-spinner"></div>
+          <p>Loading pipeline...</p>
+        </div>
+      } @else if (filteredMatches().length === 0) {
+        <div class="empty-panel-sm">
+          <i class="fa-solid fa-folder-open"></i>
+          <p>No matches registered yet.</p>
+        </div>
+      } @else {
+        <div class="pipeline-list">
+          @for (match of filteredMatches(); track match._id) {
+            <div class="pipeline-item" [class.is-live-item]="match.status === 'LIVE'">
+              <div class="item-main">
+                <div class="item-top">
+                  <span class="sport-tag-sm">
+                    <i [class]="getSportIcon(match.sport)"></i>
+                    <span>{{ match.sport }}</span>
+                  </span>
+
+                  @if (match.status === 'LIVE') {
+                    <span class="badge-live">LIVE</span>
+                  } @else if (match.status === 'UPCOMING') {
+                    <span class="badge-upcoming">UPCOMING</span>
+                  } @else {
+                    <span class="badge-completed">FINISHED</span>
+                  }
+                </div>
+
+                <h4 class="item-name">{{ match.name }}</h4>
+
+                <div class="item-meta">
+                  <span><i class="fa-regular fa-calendar"></i> {{ match.startTime | date:'short' }}</span>
+                  <span class="mono-text">ID: {{ match._id | slice:0:8 }}</span>
+                </div>
+              </div>
+
+              <div class="item-side">
+                <span class="socket-pill" [class.is-on]="match.socketEnabled">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>{{ match.socketEnabled ? 'Sync' : 'Off' }}</span>
+                </span>
+                <a [routerLink]="['/matches', match._id]" class="btn-icon-link" title="Open Details">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

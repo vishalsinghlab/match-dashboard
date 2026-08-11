@@ -1,0 +1,212 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-main">
+      <h1 class="page-title">Match Directory</h1>
+      <p class="page-subtitle">Real-time score updates, live match streams, and upcoming schedules across sports.</p>
+    </div>
+    
+    <div class="header-actions">
+      <a routerLink="/admin/matches" class="btn-secondary">
+        <i class="fa-solid fa-sliders"></i>
+        <span>Manage Fixtures</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Elevated Metric Overview Bar -->
+  <div class="metrics-row">
+    <button type="button" class="metric-card-elevated" (click)="setFilter('ALL')" [class.is-active]="activeFilter() === 'ALL'">
+      <div class="metric-indicator-bar bar-primary"></div>
+      <div class="metric-top">
+        <span class="metric-label">All Fixtures</span>
+        <div class="metric-icon-badge badge-neutral">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+      </div>
+      <div class="metric-body">
+        <span class="metric-val">{{ totalCount() }}</span>
+        <span class="metric-subtext">Total active sports feeds</span>
+      </div>
+    </button>
+
+    <button type="button" class="metric-card-elevated live-card" (click)="setFilter('LIVE')" [class.is-active]="activeFilter() === 'LIVE'">
+      <div class="metric-indicator-bar bar-live"></div>
+      <div class="metric-top">
+        <span class="metric-label">Live Now</span>
+        <div class="metric-icon-badge badge-live">
+          <span class="dot-live-pulse"></span>
+          <i class="fa-solid fa-tower-broadcast"></i>
+        </div>
+      </div>
+      <div class="metric-body">
+        <span class="metric-val text-live">{{ liveCount() }}</span>
+        <span class="metric-subtext">Real-time live matches</span>
+      </div>
+    </button>
+
+    <button type="button" class="metric-card-elevated" (click)="setFilter('UPCOMING')" [class.is-active]="activeFilter() === 'UPCOMING'">
+      <div class="metric-indicator-bar bar-upcoming"></div>
+      <div class="metric-top">
+        <span class="metric-label">Upcoming</span>
+        <div class="metric-icon-badge badge-upcoming">
+          <i class="fa-regular fa-clock"></i>
+        </div>
+      </div>
+      <div class="metric-body">
+        <span class="metric-val text-upcoming">{{ upcomingCount() }}</span>
+        <span class="metric-subtext">Scheduled upcoming games</span>
+      </div>
+    </button>
+
+    <button type="button" class="metric-card-elevated" (click)="setFilter('COMPLETED')" [class.is-active]="activeFilter() === 'COMPLETED'">
+      <div class="metric-indicator-bar bar-completed"></div>
+      <div class="metric-top">
+        <span class="metric-label">Completed</span>
+        <div class="metric-icon-badge badge-completed">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+      <div class="metric-body">
+        <span class="metric-val text-completed">{{ completedCount() }}</span>
+        <span class="metric-subtext">Concluded match archives</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- Toolbar Search & Filter Controls -->
+  <div class="toolbar">
+    <div class="search-field">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        [ngModel]="searchQuery()" 
+        (ngModelChange)="searchQuery.set($event)"
+        placeholder="Filter by match name or sport..." 
+      />
+      @if (searchQuery()) {
+        <button type="button" class="btn-clear-search" (click)="searchQuery.set('')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      }
+    </div>
+
+    <div class="filter-group">
+      <button 
+        type="button" 
+        class="filter-tab" 
+        [class.is-active]="activeFilter() === 'ALL'"
+        (click)="setFilter('ALL')">
+        All
+      </button>
+      <button 
+        type="button" 
+        class="filter-tab live-tab" 
+        [class.is-active]="activeFilter() === 'LIVE'"
+        (click)="setFilter('LIVE')">
+        <span class="dot-live-pulse"></span> Live ({{ liveCount() }})
+      </button>
+      <button 
+        type="button" 
+        class="filter-tab" 
+        [class.is-active]="activeFilter() === 'UPCOMING'"
+        (click)="setFilter('UPCOMING')">
+        Upcoming ({{ upcomingCount() }})
+      </button>
+      <button 
+        type="button" 
+        class="filter-tab" 
+        [class.is-active]="activeFilter() === 'COMPLETED'"
+        (click)="setFilter('COMPLETED')">
+        Completed ({{ completedCount() }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Content State Views -->
+  @if (isLoading()) {
+    <div class="state-container">
+      <div class="loading-spinner"></div>
+      <p class="state-text">Fetching sports feed...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-panel">
+      <i class="fa-solid fa-circle-exclamation error-icon"></i>
+      <div class="error-details">
+        <h4>Connection Error</h4>
+        <p>{{ errorMessage() }}</p>
+      </div>
+      <button type="button" class="btn-retry" (click)="loadMatches()">
+        <i class="fa-solid fa-rotate-right"></i> Retry
+      </button>
+    </div>
+  } @else if (filteredMatches().length === 0) {
+    <div class="empty-panel">
+      <div class="empty-icon-box">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <h3>No Fixtures Found</h3>
+      <p>
+        @if (searchQuery() || activeFilter() !== 'ALL') {
+          No matches match your search criteria or selected filter.
+        } @else {
+          No sports fixtures are available at this moment.
+        }
+      </p>
+      @if (searchQuery() || activeFilter() !== 'ALL') {
+        <button type="button" class="btn-secondary" (click)="searchQuery.set(''); setFilter('ALL')">
+          Reset Filters
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="matches-grid">
+      @for (match of filteredMatches(); track match._id) {
+        <a class="match-card-item" [routerLink]="['/matches', match._id]" [class.is-live-card]="match.status === 'LIVE'">
+          <div class="card-header">
+            <div class="sport-tag">
+              <i [class]="getSportIcon(match.sport)"></i>
+              <span>{{ match.sport }}</span>
+            </div>
+
+            @if (match.status === 'LIVE') {
+              <span class="badge-live">
+                <span class="dot-live-pulse"></span> LIVE NOW
+              </span>
+            } @else if (match.status === 'UPCOMING') {
+              <span class="badge-upcoming">
+                UPCOMING
+              </span>
+            } @else {
+              <span class="badge-completed">
+                FINISHED
+              </span>
+            }
+          </div>
+
+          <div class="card-body">
+            <h3 class="match-name">{{ match.name }}</h3>
+            
+            <div class="card-metadata">
+              <div class="meta-row">
+                <i class="fa-regular fa-calendar"></i>
+                <span>{{ match.startTime | date:'medium' }}</span>
+              </div>
+              <div class="meta-row">
+                <i class="fa-solid fa-tower-cell"></i>
+                <span [class.text-connected]="match.socketEnabled" [class.text-muted]="!match.socketEnabled">
+                  {{ match.socketEnabled ? 'Realtime Sync Active' : 'Standard Feed' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <span class="action-label">Open Match Center</span>
+            <i class="fa-solid fa-arrow-right arrow-icon"></i>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>
