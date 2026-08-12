@@ -170,10 +170,3 @@ A web application with two surfaces — an **admin panel** and a **user panel** 
 
 ---
 
-## 8. Open Questions to Resolve Before/While Building
-
-- What exactly does "socket data" mean here — live scores, odds, commentary, something else? This drives the publisher's data source.
-- Is match data coming from a real external feed, or is this all simulated/sample data for now?
-- Single admin role, or multiple permission levels?
-- Expected concurrent connection scale (affects whether you need to plan for gateway horizontal scaling from day one or can defer it)?
-- Same-origin deployment (client, API gateway, socket gateway all under one domain) or split subdomains (affects cookie `sameSite`/`domain` settings)?

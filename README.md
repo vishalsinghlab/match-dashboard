@@ -81,3 +81,28 @@ npm run test
 
 - **REST API Base**: `http://localhost:3000/api`
 - **WebSocket Host**: `ws://localhost:3000` (`transports: ['websocket']`, `withCredentials: true`)
+
+
+## 📸 Application Screenshots
+
+### 1. Sign In & Cookie Authentication
+![Sign In Screen](./docs/screenshots/login.png)
+
+### 2. User Live Matches Hub
+![User Live Matches Hub](./docs/screenshots/live-hub.png)
+
+### 3. Live Match Details & Real-Time Socket Stream
+![Live Match Details](./docs/screenshots/match-details-live.png)
+
+### 4. Admin Dashboard & Fixtures Management
+![Admin Dashboard](./docs/screenshots/admin-console.png)
+
+### 5. Global Socket Settings Modal
+![Global Socket Settings](./docs/screenshots/global-socket-settings.png)
+
+### 6. Per-Fixture Stream Configuration Modal
+![Per-Fixture Socket Configuration](./docs/screenshots/fixture-socket-configuration.png)
+
+
+
+
