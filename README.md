@@ -1,59 +1,83 @@
-# MatchDashboard
+# Match Dashboard — Real-Time Sports Score Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.3.
+An Angular 19 single-page web application featuring live match score streaming, sports fixture filtering, and an admin control panel for real-time WebSocket settings.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **User Dashboard**:
+  - Live match list with sport filtering (Cricket, Football, Basketball, Tennis, Esports) and real-time status badges (`LIVE`, `UPCOMING`, `COMPLETED`).
+  - Live Match Details page connecting to dedicated Socket.IO rooms (`match:<matchId>`) with zero-latency score and telemetry updates.
+- **Admin Control Panel**:
+  - Match fixture creation form with reactive validation.
+  - Global Socket Settings modal to adjust streaming frequency, telemetry modes (`SCORE`, `FULL`, `STATISTICS`), and binary/compression switches.
+  - Per-match override configuration modals with instant Redis pub/sub broadcasting.
+- **Real-Time Engine**:
+  - Encapsulated Socket.IO client service with MessagePack binary payload decoding (`@msgpack/msgpack`).
+- **Reactive State**:
+  - Built using Angular 19 Signals (`signal()`, `computed()`) for fine-grained reactivity.
 
-```bash
-ng serve
+## Tech Stack
+
+- **Framework**: Angular 19 (Standalone Components, Signals, Reactive Forms, Router)
+- **Real-Time Client**: Socket.IO Client (`socket.io-client`)
+- **Binary Serialization**: `@msgpack/msgpack`
+- **Iconography**: FontAwesome 6+
+
+## Project Structure
+
+```text
+src/app/
+├── core/
+│   ├── guards/
+│   │   └── auth.guard.ts           # Route protection for admin/user paths
+│   └── services/
+│       ├── auth.ts                 # Authentication, user signals & cookie session sync
+│       ├── match.ts                # REST API client for match fixtures & admin settings
+│       └── realtime.ts             # Socket.IO client wrapper & MessagePack decoder
+└── features/
+    ├── admin/
+    │   └── matches/                # Admin fixture management & socket config modals
+    ├── auth/                       # Login & authentication view
+    └── user/
+        ├── matches/                # Public match list & status filter view
+        └── match-details/          # Live match score telemetry view
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Quick Start
 
-## Code scaffolding
+### 1. Requirements
+* Node.js 20+
+* Backend API running at `http://localhost:3000`
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+### 2. Installation & Running
 ```bash
-ng generate component component-name
+# Install dependencies
+npm install
+
+# Start local dev server
+npm start
+# or: ng serve
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Navigate to `http://localhost:4200/`. The app will automatically reload on source changes.
+
+### 3. Default Accounts
+- **Admin**: `admin` / `admin123`
+- **User**: `user` / `password123`
+
+---
+
+## Build & Test Scripts
 
 ```bash
-ng generate --help
+# Build production bundle
+npm run build
+
+# Run unit tests (Vitest)
+npm run test
 ```
 
-## Building
+## Backend API & WebSocket Integration
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **REST API Base**: `http://localhost:3000/api`
+- **WebSocket Host**: `ws://localhost:3000` (`transports: ['websocket']`, `withCredentials: true`)
