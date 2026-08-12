@@ -90,20 +90,14 @@ export class MatchDetails implements OnInit, OnDestroy {
   loadMatch(): void {
     this.isLoading.set(true);
     this.errorMessage.set('');
-    this.matchService.getMatches().subscribe({
+    this.matchService.getMatchById(this.matchId()).subscribe({
       next: (response) => {
-        const found = response.data.find(
-          (item) => item._id === this.matchId(),
-        ) ?? null;
-        this.match.set(found);
-        if (!found) {
-          this.errorMessage.set('Match fixture not found.');
-        }
+        this.match.set(response.data);
         this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Failed to load match:', error);
-        this.errorMessage.set('Failed to load match details from server.');
+        this.errorMessage.set('Match fixture not found or failed to load details from server.');
         this.isLoading.set(false);
       },
     });

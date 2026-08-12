@@ -7,6 +7,11 @@
     </div>
     
     <div class="header-actions">
+      <button type="button" class="btn-global-specs" (click)="openGlobalModal()">
+        <i class="fa-solid fa-globe"></i>
+        <span>Global Socket Defaults</span>
+      </button>
+
       <button type="button" class="btn-refresh-pipeline" (click)="loadMatches()" [disabled]="isRefreshing()">
         <div class="btn-icon-wrapper" [class.is-spinning]="isRefreshing()">
           <i class="fa-solid fa-rotate-right"></i>
@@ -291,6 +296,9 @@
                   <i class="fa-solid fa-bolt"></i>
                   <span>{{ match.socketEnabled ? 'Sync' : 'Off' }}</span>
                 </span>
+                <button type="button" class="btn-icon-link" (click)="openSettingsModal(match)" title="Configure Socket Settings">
+                  <i class="fa-solid fa-gear"></i>
+                </button>
                 <a [routerLink]="['/matches', match._id]" class="btn-icon-link" title="Open Details">
                   <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 </a>
@@ -301,4 +309,220 @@
       }
     </div>
   </div>
+
+  <!-- Global Socket Settings Modal Dialog -->
+  @if (isGlobalModalOpen()) {
+    <div class="modal-backdrop" (click)="closeGlobalModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <div class="head-title">
+            <i class="fa-solid fa-globe modal-icon"></i>
+            <div>
+              <h3>Global Socket Defaults</h3>
+              <p class="modal-sub">System-wide default streaming specifications</p>
+            </div>
+          </div>
+          <button type="button" class="btn-close-modal" (click)="closeGlobalModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (isLoadingSettings()) {
+          <div class="state-container-sm">
+            <div class="loading-spinner"></div>
+            <p>Fetching global defaults...</p>
+          </div>
+        } @else {
+          <div class="modal-body">
+            <div class="target-fixture-info">
+              <span class="sport-badge"><i class="fa-solid fa-server"></i> System</span>
+              <span class="fixture-name">Applies to all fixtures using Global Defaults</span>
+            </div>
+
+            <!-- Setting: Update Interval -->
+            <div class="setting-group">
+              <label class="setting-label">Default Stream Interval</label>
+              <div class="pill-options">
+                <button type="button" class="pill-btn" [class.is-selected]="globalSettings().updateInterval === 500" (click)="updateGlobalSettingField('updateInterval', 500)">500ms (High Freq)</button>
+                <button type="button" class="pill-btn" [class.is-selected]="globalSettings().updateInterval === 1000" (click)="updateGlobalSettingField('updateInterval', 1000)">1000ms (Fast)</button>
+                <button type="button" class="pill-btn" [class.is-selected]="globalSettings().updateInterval === 3000" (click)="updateGlobalSettingField('updateInterval', 3000)">3000ms (Standard)</button>
+                <button type="button" class="pill-btn" [class.is-selected]="globalSettings().updateInterval === 5000" (click)="updateGlobalSettingField('updateInterval', 5000)">5000ms (Relaxed)</button>
+              </div>
+            </div>
+
+            <!-- Setting: Data Payload Type -->
+            <div class="setting-group">
+              <label class="setting-label">Default Payload Data Type</label>
+              <div class="pill-options">
+                <button type="button" class="pill-btn" [class.is-selected]="globalSettings().dataType === 'SCORE'" (click)="updateGlobalSettingField('dataType', 'SCORE')">SCORE (Minimal)</button>
+                <button type="button" class="pill-btn" [class.is-selected]="globalSettings().dataType === 'FULL'" (click)="updateGlobalSettingField('dataType', 'FULL')">FULL (Score + Venue)</button>
+                <button type="button" class="pill-btn" [class.is-selected]="globalSettings().dataType === 'STATISTICS'" (click)="updateGlobalSettingField('dataType', 'STATISTICS')">STATISTICS (Full Telemetry)</button>
+              </div>
+            </div>
+
+            <!-- Toggles: Binary & Compression -->
+            <div class="toggles-grid">
+              <div class="toggle-row-sm">
+                <label class="toggle-switch" for="globalBinary">
+                  <input id="globalBinary" type="checkbox" [checked]="globalSettings().binary" (change)="updateGlobalSettingField('binary', $any($event.target).checked)" />
+                  <span class="toggle-slider"></span>
+                </label>
+                <div class="toggle-meta">
+                  <span class="toggle-title">MessagePack Binary Encoding</span>
+                  <span class="toggle-desc">Global default payload encoding</span>
+                </div>
+              </div>
+
+              <div class="toggle-row-sm">
+                <label class="toggle-switch" for="globalCompression">
+                  <input id="globalCompression" type="checkbox" [checked]="globalSettings().compression" (change)="updateGlobalSettingField('compression', $any($event.target).checked)" />
+                  <span class="toggle-slider"></span>
+                </label>
+                <div class="toggle-meta">
+                  <span class="toggle-title">Brotli Frame Compression</span>
+                  <span class="toggle-desc">Global default compression</span>
+                </div>
+              </div>
+            </div>
+
+            @if (settingsSuccessMessage()) {
+              <div class="success-callout">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>{{ settingsSuccessMessage() }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="closeGlobalModal()">
+              <i class="fa-solid fa-xmark"></i>
+              <span>Cancel</span>
+            </button>
+            <button type="button" class="btn-primary-submit" (click)="saveGlobalSettings()" [disabled]="isSavingSettings()">
+              @if (isSavingSettings()) {
+                <span class="spinner-sm"></span>
+                <span>Broadcasting...</span>
+              } @else {
+                <i class="fa-solid fa-globe"></i>
+                <span>Save & Broadcast Global Defaults</span>
+              }
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Fixture Socket Settings Modal Dialog -->
+  @if (selectedSettingsMatch(); as targetMatch) {
+    <div class="modal-backdrop" (click)="closeSettingsModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <div class="head-title">
+            <i class="fa-solid fa-sliders modal-icon"></i>
+            <div>
+              <h3>Fixture Socket Configuration</h3>
+              <p class="modal-sub">Match ID: <code class="mono-text">{{ targetMatch._id }}</code></p>
+            </div>
+          </div>
+          <button type="button" class="btn-close-modal" (click)="closeSettingsModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (isLoadingSettings()) {
+          <div class="state-container-sm">
+            <div class="loading-spinner"></div>
+            <p>Fetching channel settings...</p>
+          </div>
+        } @else {
+          <div class="modal-body">
+            <div class="target-fixture-info">
+              <span class="sport-badge">
+                <i [class]="getSportIcon(targetMatch.sport)"></i> {{ targetMatch.sport }}
+              </span>
+              <span class="fixture-name">{{ targetMatch.name }}</span>
+            </div>
+
+            <!-- Hierarchy Toggle: Inherit Global Defaults -->
+            <div class="toggle-row-sm highlight-toggle">
+              <label class="toggle-switch" for="modalUseGlobal">
+                <input id="modalUseGlobal" type="checkbox" [checked]="selectedSettings().useGlobalDefaults" (change)="updateSettingField('useGlobalDefaults', $any($event.target).checked)" />
+                <span class="toggle-slider"></span>
+              </label>
+              <div class="toggle-meta">
+                <span class="toggle-title">Inherit System Global Defaults</span>
+                <span class="toggle-desc">Turn off to apply custom per-fixture override settings</span>
+              </div>
+            </div>
+
+            @if (!selectedSettings().useGlobalDefaults) {
+              <!-- Setting: Update Interval -->
+              <div class="setting-group">
+                <label class="setting-label">Per-Fixture Stream Interval Override</label>
+                <div class="pill-options">
+                  <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().updateInterval === 500" (click)="updateSettingField('updateInterval', 500)">500ms (High Freq)</button>
+                  <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().updateInterval === 1000" (click)="updateSettingField('updateInterval', 1000)">1000ms (Fast)</button>
+                  <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().updateInterval === 3000" (click)="updateSettingField('updateInterval', 3000)">3000ms (Standard)</button>
+                  <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().updateInterval === 5000" (click)="updateSettingField('updateInterval', 5000)">5000ms (Relaxed)</button>
+                </div>
+              </div>
+
+              <!-- Setting: Data Payload Type -->
+              <div class="setting-group">
+                <label class="setting-label">Per-Fixture Data Type Override</label>
+                <div class="pill-options">
+                  <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().dataType === 'SCORE'" (click)="updateSettingField('dataType', 'SCORE')">SCORE (Minimal)</button>
+                  <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().dataType === 'FULL'" (click)="updateSettingField('dataType', 'FULL')">FULL (Score + Venue)</button>
+                  <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().dataType === 'STATISTICS'" (click)="updateSettingField('dataType', 'STATISTICS')">STATISTICS (Full Telemetry)</button>
+                </div>
+              </div>
+            } @else {
+              <div class="inherited-badge-note">
+                <i class="fa-solid fa-info-circle"></i>
+                <span>Currently inheriting active global system defaults.</span>
+              </div>
+            }
+
+            <!-- Toggles: Binary & Compression -->
+            <div class="toggles-grid">
+              <div class="toggle-row-sm">
+                <label class="toggle-switch" for="modalSocketEnabled">
+                  <input id="modalSocketEnabled" type="checkbox" [checked]="selectedSettings().socketEnabled" (change)="updateSettingField('socketEnabled', $any($event.target).checked)" />
+                  <span class="toggle-slider"></span>
+                </label>
+                <div class="toggle-meta">
+                  <span class="toggle-title">Active Socket Stream</span>
+                  <span class="toggle-desc">Publish real-time telemetry channel</span>
+                </div>
+              </div>
+            </div>
+
+            @if (settingsSuccessMessage()) {
+              <div class="success-callout">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>{{ settingsSuccessMessage() }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="closeSettingsModal()">
+              <i class="fa-solid fa-xmark"></i>
+              <span>Cancel</span>
+            </button>
+            <button type="button" class="btn-primary-submit" (click)="saveSettings()" [disabled]="isSavingSettings()">
+              @if (isSavingSettings()) {
+                <span class="spinner-sm"></span>
+                <span>Broadcasting...</span>
+              } @else {
+                <i class="fa-solid fa-bolt"></i>
+                <span>Save & Broadcast Settings</span>
+              }
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
 </div>

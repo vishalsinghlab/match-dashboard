@@ -28,6 +28,43 @@ export class Matches implements OnInit {
   readonly activeFilter = signal<FilterStatus>('ALL');
   readonly searchQuery = signal<string>('');
 
+  // Global Settings Modal state
+  readonly isGlobalModalOpen = signal<boolean>(false);
+  readonly globalSettings = signal<{
+    updateInterval: number;
+    dataType: 'SCORE' | 'FULL' | 'STATISTICS';
+    binary: boolean;
+    compression: boolean;
+    socketEnabled: boolean;
+  }>({
+    updateInterval: 3000,
+    dataType: 'SCORE',
+    binary: true,
+    compression: true,
+    socketEnabled: true,
+  });
+
+  // Socket Settings Modal state
+  readonly selectedSettingsMatch = signal<Match | null>(null);
+  readonly selectedSettings = signal<{
+    useGlobalDefaults: boolean;
+    updateInterval: number;
+    dataType: 'SCORE' | 'FULL' | 'STATISTICS';
+    binary: boolean;
+    compression: boolean;
+    socketEnabled: boolean;
+  }>({
+    useGlobalDefaults: true,
+    updateInterval: 3000,
+    dataType: 'SCORE',
+    binary: true,
+    compression: true,
+    socketEnabled: true,
+  });
+  readonly isLoadingSettings = signal<boolean>(false);
+  readonly isSavingSettings = signal<boolean>(false);
+  readonly settingsSuccessMessage = signal<string>('');
+
   readonly popularSports = ['Cricket', 'Football', 'Basketball', 'Tennis', 'Esports'];
 
   readonly matchForm = this.formBuilder.nonNullable.group({
@@ -95,6 +132,120 @@ export class Matches implements OnInit {
         this.errorMessage.set('Failed to load matches from server.');
         this.isLoading.set(false);
         this.isRefreshing.set(false);
+      },
+    });
+  }
+
+  openGlobalModal(): void {
+    this.isGlobalModalOpen.set(true);
+    this.isLoadingSettings.set(true);
+    this.settingsSuccessMessage.set('');
+
+    this.matchService.getGlobalSettings().subscribe({
+      next: (settings) => {
+        this.globalSettings.set({
+          updateInterval: settings.updateInterval ?? 3000,
+          dataType: settings.dataType ?? 'SCORE',
+          binary: settings.binary ?? true,
+          compression: settings.compression ?? true,
+          socketEnabled: settings.socketEnabled ?? true,
+        });
+        this.isLoadingSettings.set(false);
+      },
+      error: () => {
+        this.isLoadingSettings.set(false);
+      },
+    });
+  }
+
+  closeGlobalModal(): void {
+    this.isGlobalModalOpen.set(false);
+  }
+
+  updateGlobalSettingField<K extends keyof ReturnType<typeof this.globalSettings>>(field: K, value: ReturnType<typeof this.globalSettings>[K]): void {
+    this.globalSettings.update((curr) => ({ ...curr, [field]: value }));
+  }
+
+  saveGlobalSettings(): void {
+    this.isSavingSettings.set(true);
+    this.settingsSuccessMessage.set('');
+
+    this.matchService.updateGlobalSettings(this.globalSettings()).subscribe({
+      next: () => {
+        this.isSavingSettings.set(false);
+        this.settingsSuccessMessage.set('Global socket defaults updated & broadcasted!');
+        setTimeout(() => {
+          this.closeGlobalModal();
+          this.loadMatches();
+        }, 1200);
+      },
+      error: (err) => {
+        console.error('Failed to save global settings:', err);
+        this.isSavingSettings.set(false);
+      },
+    });
+  }
+
+  openSettingsModal(match: Match): void {
+    this.selectedSettingsMatch.set(match);
+    this.isLoadingSettings.set(true);
+    this.settingsSuccessMessage.set('');
+
+    this.matchService.getMatchSettings(match._id).subscribe({
+      next: (settings) => {
+        this.selectedSettings.set({
+          useGlobalDefaults: settings.useGlobalDefaults ?? true,
+          updateInterval: settings.updateInterval ?? 3000,
+          dataType: settings.dataType ?? 'SCORE',
+          binary: settings.binary ?? true,
+          compression: settings.compression ?? true,
+          socketEnabled: settings.socketEnabled ?? match.socketEnabled,
+        });
+        this.isLoadingSettings.set(false);
+      },
+      error: () => {
+        this.selectedSettings.set({
+          useGlobalDefaults: true,
+          updateInterval: 3000,
+          dataType: 'SCORE',
+          binary: true,
+          compression: true,
+          socketEnabled: match.socketEnabled,
+        });
+        this.isLoadingSettings.set(false);
+      },
+    });
+  }
+
+  closeSettingsModal(): void {
+    this.selectedSettingsMatch.set(null);
+  }
+
+  updateSettingField<K extends keyof ReturnType<typeof this.selectedSettings>>(field: K, value: ReturnType<typeof this.selectedSettings>[K]): void {
+    this.selectedSettings.update((curr) => ({ ...curr, [field]: value }));
+  }
+
+  saveSettings(): void {
+    const match = this.selectedSettingsMatch();
+    if (!match) return;
+
+    this.isSavingSettings.set(true);
+    this.settingsSuccessMessage.set('');
+
+    const payload = this.selectedSettings();
+
+    this.matchService.updateMatchSettings(match._id, payload).subscribe({
+      next: () => {
+        this.isSavingSettings.set(false);
+        this.settingsSuccessMessage.set('Fixture settings updated & broadcasted via Redis!');
+        setTimeout(() => {
+          this.closeSettingsModal();
+          this.loadMatches();
+        }, 1200);
+      },
+      error: (err) => {
+        console.error('Failed to update settings:', err);
+        this.isSavingSettings.set(false);
       },
     });
   }
