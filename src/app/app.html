@@ -3,9 +3,9 @@
   <div class="header-container">
     <div class="brand-group">
       <a routerLink="/matches" class="brand-logo">
-        <div class="logo-mark">
+        <!-- <div class="logo-mark">
           <span class="dot-live-pulse"></span>
-        </div>
+        </div> -->
         <span class="brand-name">MATCH ENGINE</span>
         <span class="brand-version">v1.0</span>
       </a>
@@ -17,19 +17,27 @@
           <span>Live Hub</span>
         </a>
         @if (isAdmin()) {
-          <a routerLink="/admin/matches" routerLinkActive="active-link" class="nav-link">
-            <i class="fa-solid fa-sliders"></i>
-            <span>Admin Console</span>
-          </a>
+        <a routerLink="/admin/matches" routerLinkActive="active-link" class="nav-link">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Admin Console</span>
+        </a>
         }
       </nav>
     </div>
 
     <div class="header-right">
-      <!-- <div class="system-status">
-          <span class="status-dot"></span>
-          <span class="status-text">Realtime Telemetry Active</span>
-        </div> -->
+      <button type="button" class="btn-theme-toggle" (click)="cycleTheme()" [title]="'Current theme: ' + themeService.currentTheme() + '. Click to cycle.'">
+        @if (themeService.currentTheme() === 'dark') {
+          <i class="fa-solid fa-moon"></i>
+          <span>Dark</span>
+        } @else if (themeService.currentTheme() === 'light') {
+          <i class="fa-solid fa-sun"></i>
+          <span>Light</span>
+        } @else {
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Cyber</span>
+        }
+      </button>
 
       <div class="nav-divider"></div>
 

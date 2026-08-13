@@ -1,7 +1,7 @@
 /* Professional Product Design System & Global Tokens */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
-:root {
+:root, [data-theme="dark"] {
   /* Color Palette - Restrained Dark System */
   --bg-canvas: #090c10;
   --bg-surface: #111622;
@@ -48,6 +48,88 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+[data-theme="light"] {
+  --bg-canvas: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+  --bg-surface-active: #cbd5e1;
+
+  --border-subtle: #e2e8f0;
+  --border-default: #cbd5e1;
+  --border-strong: #94a3b8;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+
+  --accent-primary: #4f46e5;
+  --accent-primary-hover: #4338ca;
+  --accent-primary-subtle: rgba(79, 70, 229, 0.1);
+
+  --accent-live: #dc2626;
+  --accent-live-subtle: rgba(220, 38, 38, 0.1);
+
+  --accent-upcoming: #d97706;
+  --accent-upcoming-subtle: rgba(217, 119, 6, 0.1);
+
+  --accent-completed: #059669;
+  --accent-completed-subtle: rgba(5, 150, 105, 0.1);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.12);
+}
+
+[data-theme="cyber"] {
+  --bg-canvas: #090314;
+  --bg-surface: #14072b;
+  --bg-surface-elevated: #1f0b42;
+  --bg-surface-hover: #2d105e;
+  --bg-surface-active: #3b157a;
+
+  --border-subtle: #2d105e;
+  --border-default: #4f1d96;
+  --border-strong: #7b2cbf;
+
+  --text-primary: #00f5d4;
+  --text-secondary: #e0aaff;
+  --text-muted: #9d4edd;
+  --text-dim: #5a189a;
+
+  --accent-primary: #f72585;
+  --accent-primary-hover: #b5179e;
+  --accent-primary-subtle: rgba(247, 37, 133, 0.15);
+
+  --accent-live: #ff0055;
+  --accent-live-subtle: rgba(255, 0, 85, 0.15);
+
+  --accent-upcoming: #ffb703;
+  --accent-upcoming-subtle: rgba(255, 183, 3, 0.15);
+
+  --accent-completed: #00f5d4;
+  --accent-completed-subtle: rgba(0, 245, 212, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(123, 44, 191, 0.3);
+  --shadow-lg: 0 12px 36px rgba(247, 37, 133, 0.25);
+  --shadow-glow: 0 0 24px rgba(0, 245, 212, 0.3);
+}
+
+/* Global Theme Smooth Transitions */
+body, .app-header, .page-container, .telemetry-card, .scoreboard-hero, .metric-card-elevated, .match-card, .btn-secondary, .btn-logout, .btn-theme-toggle {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+[data-theme="light"] input, 
+[data-theme="light"] select, 
+[data-theme="light"] button, 
+[data-theme="light"] textarea {
+  color-scheme: light;
 }
 
 *, *::before, *::after {

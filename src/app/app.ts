@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Auth } from './core/services/auth';
+import { ThemeService } from './core/services/theme';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { Auth } from './core/services/auth';
 export class App implements OnInit {
   private readonly router = inject(Router);
   private readonly auth = inject(Auth);
+  readonly themeService = inject(ThemeService);
 
   readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
 
@@ -18,6 +20,10 @@ export class App implements OnInit {
     if (!this.auth.currentUser()) {
       this.auth.getCurrentUser().subscribe();
     }
+  }
+
+  cycleTheme(): void {
+    this.themeService.cycleTheme();
   }
 
   isLoginPage(): boolean {

@@ -8,146 +8,148 @@
   </div>
 
   @if (isLoading()) {
-    <div class="state-panel">
-      <div class="loading-spinner"></div>
-      <p>Establishing match stream connection...</p>
-    </div>
+  <div class="state-panel">
+    <div class="loading-spinner"></div>
+    <p>Establishing match stream connection...</p>
+  </div>
   } @else if (errorMessage()) {
-    <div class="error-panel">
-      <div class="error-content">
-        <i class="fa-solid fa-triangle-exclamation error-icon"></i>
-        <div class="error-text">
-          <h4>Fixture Not Found</h4>
-          <p>{{ errorMessage() }}</p>
-        </div>
+  <div class="error-panel">
+    <div class="error-content">
+      <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+      <div class="error-text">
+        <h4>Fixture Not Found</h4>
+        <p>{{ errorMessage() }}</p>
       </div>
-      <a routerLink="/matches" class="btn-secondary">Return to Matches Directory</a>
     </div>
+    <a routerLink="/matches" class="btn-secondary">Return to Matches Directory</a>
+  </div>
   } @else if (match(); as m) {
-    <!-- Main Broadcast Scoreboard Header -->
-    <div class="scoreboard-hero" [class.is-live-hero]="m.status === 'LIVE'">
-      <div class="hero-top">
-        <div class="sport-badge">
-          <i [class]="getSportIcon(m.sport)"></i>
-          <span>{{ m.sport }}</span>
-        </div>
-
-        @if (m.status === 'LIVE') {
-          <span class="badge-live">
-            <span class="dot-live-pulse"></span> LIVE BROADCAST
-          </span>
-        } @else if (m.status === 'UPCOMING') {
-          <span class="badge-upcoming">UPCOMING</span>
-        } @else {
-          <span class="badge-completed">COMPLETED</span>
-        }
+  <!-- Main Broadcast Scoreboard Header -->
+  <div class="scoreboard-hero" [class.is-live-hero]="m.status === 'LIVE'">
+    <div class="hero-top">
+      <div class="sport-badge">
+        <i [class]="getSportIcon(m.sport)"></i>
+        <span>{{ m.sport }}</span>
       </div>
 
-      <h1 class="hero-match-name">{{ m.name }}</h1>
-
-      <div class="hero-meta">
-        <span class="meta-item">
-          <i class="fa-regular fa-calendar-days"></i>
-          <span>{{ m.startTime | date:'medium' }}</span>
-        </span>
-        <span class="meta-divider">•</span>
-        <span class="meta-item mono-text">
-          <span>MATCH ID: {{ m._id }}</span>
-        </span>
-      </div>
-
-      <!-- Live Score Banner (when live or update present) -->
-      @if (latestUpdate(); as update) {
-        <div class="live-score-display">
-          <div class="team-score-card">
-            <span class="team-label">HOME</span>
-            <span class="score-digit">{{ update.score.home }}</span>
-          </div>
-          <div class="score-divider">:</div>
-          <div class="team-score-card">
-            <span class="team-label">AWAY</span>
-            <span class="score-digit">{{ update.score.away }}</span>
-          </div>
-        </div>
-        <div class="update-ticker">
-          <span class="dot-live-pulse"></span>
-          <span>Live payload received at {{ update.timestamp | date:'mediumTime' }}</span>
-        </div>
+      @if (m.status === 'LIVE') {
+      <span class="badge-live">
+        <span class="dot-live-pulse"></span> LIVE BROADCAST
+      </span>
+      } @else if (m.status === 'UPCOMING') {
+      <span class="badge-upcoming">UPCOMING</span>
+      } @else {
+      <span class="badge-completed">COMPLETED</span>
       }
     </div>
 
-    <!-- Telemetry & Stream Grid -->
-    <div class="telemetry-grid">
-      <!-- Connection Status Card (Admin Only) -->
+    <h1 class="hero-match-name">{{ m.name }}</h1>
+
+    <div class="hero-meta">
+      <span class="meta-item">
+        <i class="fa-regular fa-calendar-days"></i>
+        <span>{{ m.startTime | date:'medium' }}</span>
+      </span>
       @if (isAdmin()) {
-        <div class="telemetry-card">
-          <div class="card-head">
-            <i class="fa-solid fa-network-wired"></i>
-            <h3>WebSocket Channel Specs</h3>
-          </div>
-
-          <div class="status-banner" [class.is-online]="socketConnected()">
-            <div class="status-indicator">
-              <span class="status-dot-sm"></span>
-              <span class="status-name">
-                {{ socketConnected() ? 'Channel Connected' : 'Channel Offline' }}
-              </span>
-            </div>
-            <span class="protocol-tag">Socket.IO</span>
-          </div>
-
-          <div class="spec-list">
-            <div class="spec-row">
-              <span class="spec-label">Match Room Channel:</span>
-              <code class="spec-code">match:{{ matchId() }}</code>
-            </div>
-            <div class="spec-row">
-              <span class="spec-label">Payload Encoding:</span>
-              <span class="spec-value">MessagePack (Binary)</span>
-            </div>
-            <div class="spec-row">
-              <span class="spec-label">Realtime Streaming:</span>
-              <span class="spec-value" [class.text-active]="m.socketEnabled" [class.text-muted]="!m.socketEnabled">
-                {{ m.socketEnabled ? 'Enabled' : 'Disabled' }}
-              </span>
-            </div>
-          </div>
-        </div>
+      <span class="meta-divider">•</span>
+      <span class="meta-item mono-text">
+        <span>MATCH ID: {{ m._id }}</span>
+      </span>
       }
+    </div>
 
-      <!-- Broadcast Status / Event Log Card -->
-      <div class="telemetry-card">
-        <div class="card-head">
-          <i class="fa-solid fa-tower-broadcast"></i>
-          <h3>Live Broadcast Telemetry</h3>
+    <!-- Live Score Banner (when live or update present) -->
+    @if (latestUpdate(); as update) {
+    <div class="live-score-display">
+      <div class="team-score-card">
+        <span class="team-label">HOME</span>
+        <span class="score-digit">{{ update.score.home }}</span>
+      </div>
+      <div class="score-divider">:</div>
+      <div class="team-score-card">
+        <span class="team-label">AWAY</span>
+        <span class="score-digit">{{ update.score.away }}</span>
+      </div>
+    </div>
+    <div class="update-ticker">
+      <span class="dot-live-pulse"></span>
+      <span>Live payload received at {{ update.timestamp | date:'mediumTime' }}</span>
+    </div>
+    }
+  </div>
+
+  <!-- Telemetry & Stream Grid -->
+  <div class="telemetry-grid">
+    <!-- Connection Status Card (Admin Only) -->
+    @if (isAdmin()) {
+    <div class="telemetry-card">
+      <div class="card-head">
+        <i class="fa-solid fa-network-wired"></i>
+        <h3>WebSocket Channel Specs</h3>
+      </div>
+
+      <div class="status-banner" [class.is-online]="socketConnected()">
+        <div class="status-indicator">
+          <span class="status-dot-sm"></span>
+          <span class="status-name">
+            {{ socketConnected() ? 'Channel Connected' : 'Channel Offline' }}
+          </span>
         </div>
+        <span class="protocol-tag">Socket.IO</span>
+      </div>
 
-        <div class="stream-state-box">
-          @if (latestUpdate(); as update) {
-            <div class="payload-feed-item">
-              <div class="feed-header">
-                <span class="feed-badge">MATCH UPDATE</span>
-                <span class="feed-time">{{ update.timestamp | date:'mediumTime' }}</span>
-              </div>
-              <p class="feed-desc">Current Score: Home {{ update.score.home }} - {{ update.score.away }} Away</p>
-            </div>
+      <div class="spec-list">
+        <div class="spec-row">
+          <span class="spec-label">Match Room Channel:</span>
+          <code class="spec-code">match:{{ matchId() }}</code>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">Payload Encoding:</span>
+          <span class="spec-value">MessagePack (Binary)</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">Realtime Streaming:</span>
+          <span class="spec-value" [class.text-active]="m.socketEnabled" [class.text-muted]="!m.socketEnabled">
+            {{ m.socketEnabled ? 'Enabled' : 'Disabled' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Broadcast Status / Event Log Card -->
+    <div class="telemetry-card">
+      <div class="card-head">
+        <i class="fa-solid fa-tower-broadcast"></i>
+        <h3>Live Broadcast Telemetry</h3>
+      </div>
+
+      <div class="stream-state-box">
+        @if (latestUpdate(); as update) {
+        <div class="payload-feed-item">
+          <div class="feed-header">
+            <span class="feed-badge">MATCH UPDATE</span>
+            <span class="feed-time">{{ update.timestamp | date:'mediumTime' }}</span>
+          </div>
+          <p class="feed-desc">Current Score: Home {{ update.score.home }} - {{ update.score.away }} Away</p>
+        </div>
+        } @else {
+        <div class="stream-waiting">
+          <i class="fa-solid fa-signal signal-icon"></i>
+          @if (m.status === 'LIVE') {
+          <h4>Listening for live telemetry...</h4>
+          <p>Real-time events will appear automatically when published to channel <code>match:{{ matchId() }}</code></p>
+          } @else if (m.status === 'UPCOMING') {
+          <h4>Match Not Started</h4>
+          <p>Telemetry stream will activate automatically when the fixture kicks off.</p>
           } @else {
-            <div class="stream-waiting">
-              <i class="fa-solid fa-signal signal-icon"></i>
-              @if (m.status === 'LIVE') {
-                <h4>Listening for live telemetry...</h4>
-                <p>Real-time events will appear automatically when published to channel <code>match:{{ matchId() }}</code></p>
-              } @else if (m.status === 'UPCOMING') {
-                <h4>Match Not Started</h4>
-                <p>Telemetry stream will activate automatically when the fixture kicks off.</p>
-              } @else {
-                <h4>Match Concluded</h4>
-                <p>Stream closed. Final score recorded in database.</p>
-              }
-            </div>
+          <h4>Match Concluded</h4>
+          <p>Stream closed. Final score recorded in database.</p>
           }
         </div>
+        }
       </div>
     </div>
+  </div>
   }
 </div>

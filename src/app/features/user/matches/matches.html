@@ -194,12 +194,14 @@
                 <i class="fa-regular fa-calendar"></i>
                 <span>{{ match.startTime | date:'medium' }}</span>
               </div>
-              <div class="meta-row">
-                <i class="fa-solid fa-tower-cell"></i>
-                <span [class.text-connected]="match.socketEnabled" [class.text-muted]="!match.socketEnabled">
-                  {{ match.socketEnabled ? 'Realtime Sync Active' : 'Standard Feed' }}
-                </span>
-              </div>
+              @if (isAdmin()) {
+                <div class="meta-row">
+                  <i class="fa-solid fa-tower-cell"></i>
+                  <span [class.text-connected]="match.socketEnabled" [class.text-muted]="!match.socketEnabled">
+                    {{ match.socketEnabled ? 'Realtime Sync Active' : 'Standard Feed' }}
+                  </span>
+                </div>
+              }
             </div>
           </div>
 
