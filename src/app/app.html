@@ -16,10 +16,12 @@
           <i class="fa-solid fa-trophy"></i>
           <span>Live Hub</span>
         </a>
-        <a routerLink="/admin/matches" routerLinkActive="active-link" class="nav-link">
-          <i class="fa-solid fa-sliders"></i>
-          <span>Admin Console</span>
-        </a>
+        @if (isAdmin()) {
+          <a routerLink="/admin/matches" routerLinkActive="active-link" class="nav-link">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Admin Console</span>
+          </a>
+        }
       </nav>
     </div>
 

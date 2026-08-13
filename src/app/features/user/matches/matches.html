@@ -7,10 +7,12 @@
     </div>
     
     <div class="header-actions">
-      <a routerLink="/admin/matches" class="btn-secondary">
-        <i class="fa-solid fa-sliders"></i>
-        <span>Manage Fixtures</span>
-      </a>
+      @if (isAdmin()) {
+        <a routerLink="/admin/matches" class="btn-secondary">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Manage Fixtures</span>
+        </a>
+      }
     </div>
   </div>
 

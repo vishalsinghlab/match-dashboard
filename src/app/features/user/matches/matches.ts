@@ -6,6 +6,7 @@ import {
   Match,
   MatchService,
 } from '../../../core/services/match';
+import { Auth } from '../../../core/services/auth';
 
 export type FilterStatus = 'ALL' | 'LIVE' | 'UPCOMING' | 'COMPLETED';
 
@@ -17,6 +18,7 @@ export type FilterStatus = 'ALL' | 'LIVE' | 'UPCOMING' | 'COMPLETED';
 })
 export class Matches implements OnInit {
   private readonly matchService = inject(MatchService);
+  private readonly auth = inject(Auth);
 
   readonly matches = signal<Match[]>([]);
   readonly isLoading = signal<boolean>(true);
@@ -24,6 +26,8 @@ export class Matches implements OnInit {
 
   readonly activeFilter = signal<FilterStatus>('ALL');
   readonly searchQuery = signal<string>('');
+
+  readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
 
   readonly filteredMatches = computed(() => {
     const matches = this.matches();
@@ -46,6 +50,9 @@ export class Matches implements OnInit {
   readonly completedCount = computed(() => this.matches().filter((m) => m.status === 'COMPLETED').length);
 
   ngOnInit(): void {
+    if (!this.auth.currentUser()) {
+      this.auth.getCurrentUser().subscribe();
+    }
     this.loadMatches();
   }
 

@@ -78,40 +78,42 @@
 
     <!-- Telemetry & Stream Grid -->
     <div class="telemetry-grid">
-      <!-- Connection Status Card -->
-      <div class="telemetry-card">
-        <div class="card-head">
-          <i class="fa-solid fa-network-wired"></i>
-          <h3>WebSocket Channel Specs</h3>
-        </div>
+      <!-- Connection Status Card (Admin Only) -->
+      @if (isAdmin()) {
+        <div class="telemetry-card">
+          <div class="card-head">
+            <i class="fa-solid fa-network-wired"></i>
+            <h3>WebSocket Channel Specs</h3>
+          </div>
 
-        <div class="status-banner" [class.is-online]="socketConnected()">
-          <div class="status-indicator">
-            <span class="status-dot-sm"></span>
-            <span class="status-name">
-              {{ socketConnected() ? 'Channel Connected' : 'Channel Offline' }}
-            </span>
+          <div class="status-banner" [class.is-online]="socketConnected()">
+            <div class="status-indicator">
+              <span class="status-dot-sm"></span>
+              <span class="status-name">
+                {{ socketConnected() ? 'Channel Connected' : 'Channel Offline' }}
+              </span>
+            </div>
+            <span class="protocol-tag">Socket.IO</span>
           </div>
-          <span class="protocol-tag">Socket.IO</span>
-        </div>
 
-        <div class="spec-list">
-          <div class="spec-row">
-            <span class="spec-label">Match Room Channel:</span>
-            <code class="spec-code">match:{{ matchId() }}</code>
-          </div>
-          <div class="spec-row">
-            <span class="spec-label">Payload Encoding:</span>
-            <span class="spec-value">MessagePack (Binary)</span>
-          </div>
-          <div class="spec-row">
-            <span class="spec-label">Realtime Streaming:</span>
-            <span class="spec-value" [class.text-active]="m.socketEnabled" [class.text-muted]="!m.socketEnabled">
-              {{ m.socketEnabled ? 'Enabled' : 'Disabled' }}
-            </span>
+          <div class="spec-list">
+            <div class="spec-row">
+              <span class="spec-label">Match Room Channel:</span>
+              <code class="spec-code">match:{{ matchId() }}</code>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Payload Encoding:</span>
+              <span class="spec-value">MessagePack (Binary)</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Realtime Streaming:</span>
+              <span class="spec-value" [class.text-active]="m.socketEnabled" [class.text-muted]="!m.socketEnabled">
+                {{ m.socketEnabled ? 'Enabled' : 'Disabled' }}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- Broadcast Status / Event Log Card -->
       <div class="telemetry-card">

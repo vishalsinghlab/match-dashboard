@@ -2,6 +2,7 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -14,6 +15,7 @@ import {
 } from '../../../core/services/match';
 
 import { MatchUpdate, RealtimeService } from '../../../core/services/realtime';
+import { Auth } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-match-details',
@@ -25,6 +27,7 @@ export class MatchDetails implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly matchService = inject(MatchService);
   private readonly realtimeService = inject(RealtimeService);
+  private readonly auth = inject(Auth);
 
   readonly match = signal<Match | null>(null);
   readonly matchId = signal<string>('');
@@ -33,9 +36,15 @@ export class MatchDetails implements OnInit, OnDestroy {
   readonly errorMessage = signal<string>('');
   readonly latestUpdate = signal<MatchUpdate | null>(null);
 
+  readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
+
   private unbindListeners: Array<() => void> = [];
 
   ngOnInit(): void {
+    if (!this.auth.currentUser()) {
+      this.auth.getCurrentUser().subscribe();
+    }
+
     const id = this.route.snapshot.paramMap.get('matchId') ?? '';
     this.matchId.set(id);
 
