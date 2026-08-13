@@ -78,7 +78,7 @@ export class MatchDetails implements OnInit, OnDestroy {
           return;
         }
 
-        console.log('Match update received:', update);
+        // console.log('Match update received:', update);
 
         this.latestUpdate.set(update);
       }),
