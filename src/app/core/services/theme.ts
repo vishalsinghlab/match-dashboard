@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type AppTheme = 'dark' | 'light' | 'cyber';
+export type AppTheme = 'dark' | 'light';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +16,7 @@ export class ThemeService {
 
   initTheme(): void {
     const savedTheme = localStorage.getItem(this.STORAGE_KEY) as AppTheme | null;
-    if (savedTheme && ['dark', 'light', 'cyber'].includes(savedTheme)) {
+    if (savedTheme && ['dark', 'light'].includes(savedTheme)) {
       this.applyTheme(savedTheme);
     } else {
       const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
@@ -30,9 +30,7 @@ export class ThemeService {
   }
 
   cycleTheme(): void {
-    const themes: AppTheme[] = ['dark', 'light', 'cyber'];
-    const currentIndex = themes.indexOf(this.currentTheme());
-    const nextTheme = themes[(currentIndex + 1) % themes.length];
+    const nextTheme: AppTheme = this.currentTheme() === 'dark' ? 'light' : 'dark';
     this.setTheme(nextTheme);
   }
 
@@ -41,3 +39,4 @@ export class ThemeService {
     document.documentElement.setAttribute('data-theme', theme);
   }
 }
+

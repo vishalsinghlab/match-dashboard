@@ -26,16 +26,13 @@
     </div>
 
     <div class="header-right">
-      <button type="button" class="btn-theme-toggle" (click)="cycleTheme()" [title]="'Current theme: ' + themeService.currentTheme() + '. Click to cycle.'">
+      <button type="button" class="btn-theme-toggle" (click)="cycleTheme()" [title]="'Switch to ' + (themeService.currentTheme() === 'dark' ? 'Light' : 'Dark') + ' mode'">
         @if (themeService.currentTheme() === 'dark') {
           <i class="fa-solid fa-moon"></i>
-          <span>Dark</span>
-        } @else if (themeService.currentTheme() === 'light') {
-          <i class="fa-solid fa-sun"></i>
-          <span>Light</span>
+          <span>Dark Mode</span>
         } @else {
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span>Cyber</span>
+          <i class="fa-solid fa-sun"></i>
+          <span>Light Mode</span>
         }
       </button>
 

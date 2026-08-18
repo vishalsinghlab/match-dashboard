@@ -9,36 +9,21 @@
 
 .login-container {
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 28px;
-}
-
-.brand-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.5px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .login-title {
   font-family: var(--font-heading);
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
-  letter-spacing: -0.3px;
-  margin-bottom: 6px;
+  letter-spacing: -0.4px;
+  margin-bottom: 4px;
 }
 
 .login-subtitle {
@@ -50,15 +35,15 @@
 .login-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .form-group {
@@ -68,11 +53,11 @@
 }
 
 label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
 }
 
 .input-wrapper {
@@ -84,25 +69,24 @@ label {
 .input-icon {
   position: absolute;
   left: 12px;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
 input {
   width: 100%;
-  padding: 10px 12px 10px 36px;
+  padding: 8px 12px 8px 34px;
   background: var(--bg-canvas);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   color: var(--text-primary);
-  font-size: 13px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-size: 12px;
+  transition: border-color 0.15s ease;
 }
 
 input:focus {
   border-color: var(--accent-primary);
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary-subtle);
 }
 
 input::placeholder {
@@ -113,27 +97,27 @@ input::placeholder {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
   background: var(--accent-live-subtle);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   color: var(--accent-live);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .btn-login-submit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  padding: 11px;
-  border-radius: var(--radius-sm);
+  padding: 10px;
+  border-radius: var(--radius-xs);
   background: var(--accent-primary);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: none;
   color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   transition: background-color 0.15s ease;
   margin-top: 4px;
@@ -149,8 +133,8 @@ input::placeholder {
 }
 
 .spinner-sm {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #ffffff;
   border-radius: 50%;
@@ -162,28 +146,28 @@ input::placeholder {
 }
 
 .demo-section {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid var(--border-subtle);
 }
 
 .demo-header {
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .demo-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
 
 .demo-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .demo-chip {
@@ -191,25 +175,25 @@ input::placeholder {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 12px;
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
   color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .demo-chip i {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .demo-chip:hover {
   background: var(--bg-surface-hover);
-  border-color: var(--border-strong);
+  border-color: var(--border-default);
   color: var(--text-primary);
 }
 

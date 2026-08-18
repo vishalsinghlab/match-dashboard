@@ -66,11 +66,23 @@ export class MatchDetails implements OnInit, OnDestroy {
   });
 
   readonly homeScore = computed(() => {
-    return this.latestUpdate()?.score.home ?? 2;
+    if (this.latestUpdate()?.score) {
+      return this.latestUpdate()!.score.home;
+    }
+    if (this.match()?.status === 'UPCOMING') {
+      return 0;
+    }
+    return 2;
   });
 
   readonly awayScore = computed(() => {
-    return this.latestUpdate()?.score.away ?? 1;
+    if (this.latestUpdate()?.score) {
+      return this.latestUpdate()!.score.away;
+    }
+    if (this.match()?.status === 'UPCOMING') {
+      return 0;
+    }
+    return 1;
   });
 
   readonly cricketData = computed<CricketData>(() => {

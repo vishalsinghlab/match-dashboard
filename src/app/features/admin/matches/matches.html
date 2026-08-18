@@ -2,13 +2,13 @@
   <!-- Admin Console Header -->
   <div class="page-header">
     <div class="header-main">
-      <h1 class="page-title">Admin Control Console</h1>
-      <p class="page-subtitle">Configure, launch, and monitor live sports streaming pipelines.</p>
+      <h1 class="page-title">Admin Operations Console</h1>
+      <p class="page-subtitle">Configure, launch, and monitor real-time sports streaming feeds and socket pipelines.</p>
     </div>
 
     <div class="header-actions">
       <button type="button" class="btn-global-specs" (click)="openGlobalModal()">
-        <i class="fa-solid fa-globe"></i>
+        <i class="fa-solid fa-sliders"></i>
         <span>Global Socket Defaults</span>
       </button>
 
@@ -17,14 +17,14 @@
           <i class="fa-solid fa-rotate-right"></i>
         </div>
         <div class="btn-text-group">
-          <span class="btn-title">{{ isRefreshing() ? 'Refreshing Feed...' : 'Refresh Pipeline' }}</span>
+          <span class="btn-title">{{ isRefreshing() ? 'Refreshing...' : 'Refresh Pipeline' }}</span>
           <span class="btn-subtitle">Sync database records</span>
         </div>
       </button>
     </div>
   </div>
 
-  <!-- Elevated Metric Overview Bar -->
+  <!-- Operational Metrics Overview -->
   <div class="metrics-row">
     <button type="button" class="metric-card-elevated" (click)="setFilter('ALL')"
       [class.is-active]="activeFilter() === 'ALL'">
@@ -41,7 +41,7 @@
       </div>
     </button>
 
-    <button type="button" class="metric-card-elevated live-card" (click)="setFilter('LIVE')"
+    <button type="button" class="metric-card-elevated" (click)="setFilter('LIVE')"
       [class.is-active]="activeFilter() === 'LIVE'">
       <div class="metric-indicator-bar bar-live"></div>
       <div class="metric-top">
@@ -88,15 +88,15 @@
     </button>
   </div>
 
-  <!-- 2-Column Operator Layout -->
+  <!-- 2-Column Operator Workspace -->
   <div class="operator-workspace">
     <!-- Left Panel: Create Match Form -->
     <div class="panel-card form-panel">
       <div class="panel-head">
         <i class="fa-solid fa-plus panel-icon"></i>
         <div>
-          <h3>Create New Fixture</h3>
-          <p class="panel-sub">Configure feed details and launch stream</p>
+          <h3>Register New Fixture</h3>
+          <p class="panel-sub">Configure feed parameters and launch real-time stream</p>
         </div>
       </div>
 
@@ -116,7 +116,7 @@
             [class.input-error]="matchForm.controls.sport.touched && matchForm.controls.sport.invalid" />
 
           <div class="preset-chips">
-            <span class="preset-label">Quick Select:</span>
+            <span class="preset-label">Presets:</span>
             @for (sportPreset of popularSports; track sportPreset) {
             <button type="button" class="chip-item" [class.is-selected]="matchForm.controls.sport.value === sportPreset"
               (click)="selectSportPreset(sportPreset)">
@@ -132,7 +132,7 @@
 
         <div class="form-row-2col">
           <div class="form-field">
-            <label for="status">Initial Status</label>
+            <label for="status">Status</label>
             <select id="status" formControlName="status">
               <option value="UPCOMING">Upcoming</option>
               <option value="LIVE">Live</option>
@@ -160,7 +160,7 @@
           </label>
           <div class="toggle-meta">
             <span class="toggle-title">Realtime WebSocket Channel</span>
-            <span class="toggle-desc">Broadcast live scores instantly on channel <code>match:&lt;id&gt;</code></span>
+            <span class="toggle-desc">Publish stream on <code>match:&lt;id&gt;</code></span>
           </div>
         </div>
 
@@ -183,12 +183,12 @@
       </form>
     </div>
 
-    <!-- Right Panel: Fixtures Pipeline Feed -->
+    <!-- Right Panel: High-Density Operations Data Table -->
     <div class="panel-card feed-panel">
       <div class="panel-head border-bottom">
         <div class="head-left">
-          <h3>Fixtures Pipeline</h3>
-          <span class="count-badge">{{ filteredMatches().length }} registered</span>
+          <h3>Registered Fixtures Directory</h3>
+          <span class="count-badge">{{ filteredMatches().length }} active</span>
         </div>
       </div>
 
@@ -197,7 +197,7 @@
         <div class="search-field">
           <i class="fa-solid fa-magnifying-glass search-icon"></i>
           <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-            placeholder="Filter matches..." />
+            placeholder="Search fixtures by title or sport..." />
           @if (searchQuery()) {
           <button type="button" class="btn-clear-search" (click)="searchQuery.set('')">
             <i class="fa-solid fa-xmark"></i>
@@ -212,7 +212,7 @@
           </button>
           <button type="button" class="filter-tab live-tab" [class.is-active]="activeFilter() === 'LIVE'"
             (click)="setFilter('LIVE')">
-            Live
+            Live ({{ liveCount() }})
           </button>
           <button type="button" class="filter-tab" [class.is-active]="activeFilter() === 'UPCOMING'"
             (click)="setFilter('UPCOMING')">
@@ -220,65 +220,82 @@
           </button>
           <button type="button" class="filter-tab" [class.is-active]="activeFilter() === 'COMPLETED'"
             (click)="setFilter('COMPLETED')">
-            Done
+            Finished
           </button>
         </div>
       </div>
 
-      <!-- Pipeline List Items -->
+      <!-- High-Density Operations Table -->
       @if (isLoading()) {
       <div class="state-container-sm">
         <div class="loading-spinner"></div>
-        <p>Loading pipeline...</p>
+        <p>Syncing fixtures directory...</p>
       </div>
       } @else if (filteredMatches().length === 0) {
       <div class="empty-panel-sm">
         <i class="fa-solid fa-folder-open"></i>
-        <p>No matches registered yet.</p>
+        <p>No fixtures found matching current criteria.</p>
       </div>
       } @else {
-      <div class="pipeline-list">
-        @for (match of filteredMatches(); track match._id) {
-        <div class="pipeline-item" [class.is-live-item]="match.status === 'LIVE'">
-          <div class="item-main">
-            <div class="item-top">
-              <span class="sport-tag-sm">
-                <i [class]="getSportIcon(match.sport)"></i>
-                <span>{{ match.sport }}</span>
-              </span>
-
-              @if (match.status === 'LIVE') {
-              <span class="badge-live">LIVE</span>
-              } @else if (match.status === 'UPCOMING') {
-              <span class="badge-upcoming">UPCOMING</span>
-              } @else {
-              <span class="badge-completed">FINISHED</span>
-              }
-            </div>
-
-            <h4 class="item-name">{{ match.name }}</h4>
-
-            <div class="item-meta">
-              <span><i class="fa-regular fa-calendar"></i> {{ match.startTime | date:'short' }}</span>
-              <span class="mono-text">ID: {{ match._id | slice:0:8 }}</span>
-            </div>
-          </div>
-
-          <div class="item-side">
-            <span class="socket-pill" [class.is-on]="match.socketEnabled">
-              <i class="fa-solid fa-bolt"></i>
-              <span>{{ match.socketEnabled ? 'Sync' : 'Off' }}</span>
-            </span>
-            <button type="button" class="btn-icon-link" (click)="openSettingsModal(match)"
-              title="Configure Socket Settings">
-              <i class="fa-solid fa-gear"></i>
-            </button>
-            <a [routerLink]="['/matches', match._id]" class="btn-icon-link" title="Open Details">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-          </div>
-        </div>
-        }
+      <div class="ops-table-container">
+        <table class="ops-table">
+          <thead>
+            <tr>
+              <th>Fixture Details</th>
+              <th>Sport</th>
+              <th>Status</th>
+              <th>Start Time</th>
+              <th>Realtime Sync</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (match of filteredMatches(); track match._id) {
+            <tr [class.is-live-row]="match.status === 'LIVE'">
+              <td>
+                <div class="cell-fixture">
+                  <span class="cell-title">{{ match.name }}</span>
+                  <span class="cell-sub mono-text">ID: {{ match._id | slice:0:8 }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="sport-tag-sm">
+                  <i [class]="getSportIcon(match.sport)"></i>
+                  <span>{{ match.sport }}</span>
+                </span>
+              </td>
+              <td>
+                @if (match.status === 'LIVE') {
+                  <span class="badge-live"><span class="dot-live-pulse"></span> LIVE</span>
+                } @else if (match.status === 'UPCOMING') {
+                  <span class="badge-upcoming">UPCOMING</span>
+                } @else {
+                  <span class="badge-completed">FINISHED</span>
+                }
+              </td>
+              <td>
+                <span class="cell-date"><i class="fa-regular fa-calendar"></i> {{ match.startTime | date:'medium' }}</span>
+              </td>
+              <td>
+                <span class="socket-pill" [class.is-on]="match.socketEnabled">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>{{ match.socketEnabled ? 'Active' : 'Off' }}</span>
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <div class="table-actions">
+                  <button type="button" class="btn-icon-link" (click)="openSettingsModal(match)" title="Configure Socket Parameters">
+                    <i class="fa-solid fa-sliders"></i>
+                  </button>
+                  <a [routerLink]="['/matches', match._id]" class="btn-icon-link" title="Open Match Center">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
       </div>
       }
     </div>
@@ -292,7 +309,7 @@
         <div class="head-title">
           <i class="fa-solid fa-globe modal-icon"></i>
           <div>
-            <h3>Global Socket Defaults</h3>
+            <h3>Global System Socket Defaults</h3>
             <p class="modal-sub">System-wide default streaming specifications</p>
           </div>
         </div>
@@ -309,13 +326,13 @@
       } @else {
       <div class="modal-body">
         <div class="target-fixture-info">
-          <span class="sport-badge"><i class="fa-solid fa-server"></i> System</span>
-          <span class="fixture-name">Applies to all fixtures using Global Defaults</span>
+          <span class="sport-badge"><i class="fa-solid fa-server"></i> System Default</span>
+          <span class="fixture-name">Applies to all feeds using Global Settings</span>
         </div>
 
         <!-- Setting: Update Interval -->
         <div class="setting-group">
-          <label class="setting-label">Default Stream Interval</label>
+          <label class="setting-label">Default Stream Frequency</label>
           <div class="pill-options">
             <button type="button" class="pill-btn" [class.is-selected]="globalSettings().updateInterval === 500"
               (click)="updateGlobalSettingField('updateInterval', 500)">500ms (High Freq)</button>
@@ -330,7 +347,7 @@
 
         <!-- Setting: Data Payload Type -->
         <div class="setting-group">
-          <label class="setting-label">Default Payload Data Type</label>
+          <label class="setting-label">Default Payload Type</label>
           <div class="pill-options">
             <button type="button" class="pill-btn" [class.is-selected]="globalSettings().dataType === 'SCORE'"
               (click)="updateGlobalSettingField('dataType', 'SCORE')">SCORE (Minimal)</button>
@@ -350,8 +367,8 @@
               <span class="toggle-slider"></span>
             </label>
             <div class="toggle-meta">
-              <span class="toggle-title">MessagePack Binary Encoding</span>
-              <span class="toggle-desc">Global default payload encoding</span>
+              <span class="toggle-title">MessagePack Binary</span>
+              <span class="toggle-desc">Default payload encoding</span>
             </div>
           </div>
 
@@ -362,8 +379,8 @@
               <span class="toggle-slider"></span>
             </label>
             <div class="toggle-meta">
-              <span class="toggle-title">Brotli Frame Compression</span>
-              <span class="toggle-desc">Global default compression</span>
+              <span class="toggle-title">Frame Compression</span>
+              <span class="toggle-desc">Default Brotli compression</span>
             </div>
           </div>
         </div>
@@ -378,7 +395,6 @@
 
       <div class="modal-footer">
         <button type="button" class="btn-secondary" (click)="closeGlobalModal()">
-          <i class="fa-solid fa-xmark"></i>
           <span>Cancel</span>
         </button>
         <button type="button" class="btn-primary-submit" (click)="saveGlobalSettings()" [disabled]="isSavingSettings()">
@@ -386,8 +402,8 @@
           <span class="spinner-sm"></span>
           <span>Broadcasting...</span>
           } @else {
-          <i class="fa-solid fa-globe"></i>
-          <span>Save & Broadcast Global Defaults</span>
+          <i class="fa-solid fa-check"></i>
+          <span>Save & Broadcast Defaults</span>
           }
         </button>
       </div>
@@ -435,15 +451,15 @@
             <span class="toggle-slider"></span>
           </label>
           <div class="toggle-meta">
-            <span class="toggle-title">Inherit System Global Defaults</span>
-            <span class="toggle-desc">Turn off to apply custom per-fixture override settings</span>
+            <span class="toggle-title">Inherit Global Defaults</span>
+            <span class="toggle-desc">Toggle off to specify per-fixture overrides</span>
           </div>
         </div>
 
         @if (!selectedSettings().useGlobalDefaults) {
         <!-- Setting: Update Interval -->
         <div class="setting-group">
-          <label class="setting-label">Per-Fixture Stream Interval Override</label>
+          <label class="setting-label">Stream Frequency Override</label>
           <div class="pill-options">
             <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().updateInterval === 500"
               (click)="updateSettingField('updateInterval', 500)">500ms (High Freq)</button>
@@ -458,7 +474,7 @@
 
         <!-- Setting: Data Payload Type -->
         <div class="setting-group">
-          <label class="setting-label">Per-Fixture Data Type Override</label>
+          <label class="setting-label">Data Type Override</label>
           <div class="pill-options">
             <button type="button" class="pill-btn" [class.is-selected]="selectedSettings().dataType === 'SCORE'"
               (click)="updateSettingField('dataType', 'SCORE')">SCORE (Minimal)</button>
@@ -470,12 +486,12 @@
         </div>
         } @else {
         <div class="inherited-badge-note">
-          <i class="fa-solid fa-info-circle"></i>
-          <span>Currently inheriting active global system defaults.</span>
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Inheriting system global default settings.</span>
         </div>
         }
 
-        <!-- Toggles: Binary & Compression -->
+        <!-- Toggles: Socket Enabled -->
         <div class="toggles-grid">
           <div class="toggle-row-sm">
             <label class="toggle-switch" for="modalSocketEnabled">
@@ -500,7 +516,6 @@
 
       <div class="modal-footer">
         <button type="button" class="btn-secondary" (click)="closeSettingsModal()">
-          <i class="fa-solid fa-xmark"></i>
           <span>Cancel</span>
         </button>
         <button type="button" class="btn-primary-submit" (click)="saveSettings()" [disabled]="isSavingSettings()">

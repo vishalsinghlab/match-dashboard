@@ -2,37 +2,37 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-main">
-      <h1 class="page-title">Match Center</h1>
-      <p class="page-subtitle">Real-time score updates, live match streams, and upcoming schedules across sports.</p>
+      <h1 class="page-title">Live Sports Match Center</h1>
+      <p class="page-subtitle">Real-time match telemetry, live scores, and fixture schedules across global sports.</p>
     </div>
-    
+
     <div class="header-actions">
       @if (isAdmin()) {
         <a routerLink="/admin/matches" class="btn-secondary">
           <i class="fa-solid fa-sliders"></i>
-          <span>Manage Fixtures</span>
+          <span>Admin Console</span>
         </a>
       }
     </div>
   </div>
 
-  <!-- Elevated Metric Overview Bar -->
+  <!-- Operational Metric Overview Bar -->
   <div class="metrics-row">
     <button type="button" class="metric-card-elevated" (click)="setFilter('ALL')" [class.is-active]="activeFilter() === 'ALL'">
       <div class="metric-indicator-bar bar-primary"></div>
       <div class="metric-top">
         <span class="metric-label">All Fixtures</span>
         <div class="metric-icon-badge badge-neutral">
-          <i class="fa-solid fa-trophy"></i>
+          <i class="fa-solid fa-layer-group"></i>
         </div>
       </div>
       <div class="metric-body">
         <span class="metric-val">{{ totalCount() }}</span>
-        <span class="metric-subtext">Total active sports feeds</span>
+        <span class="metric-subtext">Active sports streams</span>
       </div>
     </button>
 
-    <button type="button" class="metric-card-elevated live-card" (click)="setFilter('LIVE')" [class.is-active]="activeFilter() === 'LIVE'">
+    <button type="button" class="metric-card-elevated" (click)="setFilter('LIVE')" [class.is-active]="activeFilter() === 'LIVE'">
       <div class="metric-indicator-bar bar-live"></div>
       <div class="metric-top">
         <span class="metric-label">Live Now</span>
@@ -43,7 +43,7 @@
       </div>
       <div class="metric-body">
         <span class="metric-val text-live">{{ liveCount() }}</span>
-        <span class="metric-subtext">Real-time live matches</span>
+        <span class="metric-subtext">Streaming real-time</span>
       </div>
     </button>
 
@@ -57,7 +57,7 @@
       </div>
       <div class="metric-body">
         <span class="metric-val text-upcoming">{{ upcomingCount() }}</span>
-        <span class="metric-subtext">Scheduled upcoming games</span>
+        <span class="metric-subtext">Scheduled fixtures</span>
       </div>
     </button>
 
@@ -71,26 +71,41 @@
       </div>
       <div class="metric-body">
         <span class="metric-val text-completed">{{ completedCount() }}</span>
-        <span class="metric-subtext">Completed matches & results</span>
+        <span class="metric-subtext">Archived results</span>
       </div>
     </button>
   </div>
 
-  <!-- Toolbar Search & Filter Controls -->
+  <!-- Toolbar Search, Sort & Filter Controls -->
   <div class="toolbar">
-    <div class="search-field">
-      <i class="fa-solid fa-magnifying-glass search-icon"></i>
-      <input 
-        type="text" 
-        [ngModel]="searchQuery()" 
-        (ngModelChange)="searchQuery.set($event)"
-        placeholder="Filter by match name or sport..." 
-      />
-      @if (searchQuery()) {
-        <button type="button" class="btn-clear-search" (click)="searchQuery.set('')">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      }
+    <div class="toolbar-left">
+      <div class="search-field">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input 
+          type="text" 
+          [ngModel]="searchQuery()" 
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Search by match or sport (e.g. Cricket, Football)..." 
+        />
+        @if (searchQuery()) {
+          <button type="button" class="btn-clear-search" (click)="searchQuery.set('')">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        }
+      </div>
+
+      <div class="sort-field">
+        <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i>
+        <label for="sortSelect" class="sort-label">Sort:</label>
+        <select id="sortSelect" [ngModel]="sortBy()" (ngModelChange)="setSort($event)" class="sort-select">
+          <option value="STATUS">Live First</option>
+          <option value="NEWEST_CREATED">Recently Added</option>
+          <option value="TIME_ASC">Start Time (Earliest)</option>
+          <option value="TIME_DESC">Start Time (Latest)</option>
+          <option value="SPORT">Sport Category</option>
+          <option value="NAME">Fixture Title</option>
+        </select>
+      </div>
     </div>
 
     <div class="filter-group">
@@ -120,7 +135,7 @@
         class="filter-tab" 
         [class.is-active]="activeFilter() === 'COMPLETED'"
         (click)="setFilter('COMPLETED')">
-        Completed ({{ completedCount() }})
+        Finished ({{ completedCount() }})
       </button>
     </div>
   </div>
@@ -129,35 +144,37 @@
   @if (isLoading()) {
     <div class="state-container">
       <div class="loading-spinner"></div>
-      <p class="state-text">Fetching sports feed...</p>
+      <p class="state-text">Syncing match telemetry feed...</p>
     </div>
   } @else if (errorMessage()) {
     <div class="error-panel">
-      <i class="fa-solid fa-circle-exclamation error-icon"></i>
       <div class="error-details">
-        <h4>Connection Error</h4>
-        <p>{{ errorMessage() }}</p>
+        <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+        <div>
+          <h4>Connection Failure</h4>
+          <p>{{ errorMessage() }}</p>
+        </div>
       </div>
       <button type="button" class="btn-retry" (click)="loadMatches()">
-        <i class="fa-solid fa-rotate-right"></i> Retry
+        <i class="fa-solid fa-rotate-right"></i> Retry Connection
       </button>
     </div>
   } @else if (filteredMatches().length === 0) {
     <div class="empty-panel">
       <div class="empty-icon-box">
-        <i class="fa-solid fa-trophy"></i>
+        <i class="fa-solid fa-folder-open"></i>
       </div>
-      <h3>No Matches Found</h3>
+      <h3>No Fixtures Found</h3>
       <p>
         @if (searchQuery() || activeFilter() !== 'ALL') {
-          No matches match your search criteria or selected filter.
+          No sports fixtures match your query or selected status filter.
         } @else {
-          No sports matches are available at this moment.
+          No match streams are registered in the system.
         }
       </p>
       @if (searchQuery() || activeFilter() !== 'ALL') {
         <button type="button" class="btn-secondary" (click)="searchQuery.set(''); setFilter('ALL')">
-          Reset Filters
+          Reset Filter Criteria
         </button>
       }
     </div>
@@ -191,7 +208,7 @@
             
             <div class="card-metadata">
               <div class="meta-row">
-                <i class="fa-regular fa-calendar"></i>
+                <i class="fa-regular fa-calendar-days"></i>
                 <span>{{ match.startTime | date:'medium' }}</span>
               </div>
               @if (isAdmin()) {
@@ -207,7 +224,7 @@
 
           <div class="card-footer">
             <span class="action-label">Open Match Center</span>
-            <i class="fa-solid fa-arrow-right arrow-icon"></i>
+            <i class="fa-solid fa-chevron-right arrow-icon"></i>
           </div>
         </a>
       }

@@ -2,26 +2,26 @@
   <!-- Breadcrumb Navigation Bar -->
   <div class="breadcrumb-bar">
     <a routerLink="/matches" class="btn-breadcrumb">
-      <i class="fa-solid fa-arrow-left"></i>
-      <span>Back to Matches</span>
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Return to Match Center</span>
     </a>
   </div>
 
   @if (isLoading()) {
   <div class="state-panel">
     <div class="loading-spinner"></div>
-    <p>Loading sport fixture details...</p>
+    <p>Loading sports fixture telemetry...</p>
   </div>
   } @else if (errorMessage()) {
   <div class="error-panel">
     <div class="error-content">
       <i class="fa-solid fa-triangle-exclamation error-icon"></i>
       <div class="error-text">
-        <h4>Match Not Found</h4>
+        <h4>Fixture Telemetry Unavailable</h4>
         <p>{{ errorMessage() }}</p>
       </div>
     </div>
-    <a routerLink="/matches" class="btn-secondary">Return to All Matches</a>
+    <a routerLink="/matches" class="btn-secondary">Back to Matches</a>
   </div>
   } @else if (match(); as m) {
 
@@ -33,15 +33,17 @@
         <span>{{ m.sport }}</span>
       </div>
 
-      @if (m.status === 'LIVE') {
-      <span class="badge-live">
-        <span class="dot-live-pulse"></span> LIVE BROADCAST
-      </span>
-      } @else if (m.status === 'UPCOMING') {
-      <span class="badge-upcoming">UPCOMING</span>
-      } @else {
-      <span class="badge-completed">COMPLETED</span>
-      }
+      <div class="hero-top-right">
+        @if (m.status === 'LIVE') {
+        <span class="badge-live">
+          <span class="dot-live-pulse"></span> LIVE STREAM
+        </span>
+        } @else if (m.status === 'UPCOMING') {
+        <span class="badge-upcoming">UPCOMING</span>
+        } @else {
+        <span class="badge-completed">COMPLETED</span>
+        }
+      </div>
     </div>
 
     <h1 class="hero-match-name">{{ m.name }}</h1>
@@ -60,6 +62,31 @@
     </div>
 
     <!-- DYNAMIC SPORT SCOREBOARDS -->
+    @if (m.status === 'UPCOMING') {
+    <div class="sport-scoreboard upcoming-hero">
+      <div class="hero-score-main">
+        <div class="upcoming-fixture-card">
+          <div class="team-score-card">
+            <span class="team-label">HOME TEAM</span>
+            <span class="score-digit">0</span>
+          </div>
+          <div class="upcoming-center-badge">
+            <span class="vs-label">VS</span>
+            <span class="upcoming-status-tag"><i class="fa-regular fa-clock"></i> SCHEDULED</span>
+          </div>
+          <div class="team-score-card">
+            <span class="team-label">AWAY TEAM</span>
+            <span class="score-digit">0</span>
+          </div>
+        </div>
+
+        <div class="upcoming-schedule-bar">
+          <i class="fa-regular fa-calendar-check"></i>
+          <span>Kickoff: <strong>{{ m.startTime | date:'medium' }}</strong></span>
+        </div>
+      </div>
+    </div>
+    } @else {
     @switch (sportCategory()) {
 
     <!-- 1. CRICKET SCOREBOARD HERO -->
@@ -69,7 +96,7 @@
       <div class="hero-score-main">
         <div class="score-runs-box" [class.score-pulse]="scorePulse()">
           <span class="runs-display">{{ c.runs }} / {{ c.wickets }}</span>
-          <span class="overs-display">({{ c.overs }} overs)</span>
+          <span class="overs-display">({{ c.overs }} ov)</span>
         </div>
         <div class="cricket-rates-pill">
           <span class="rate-badge">CRR: <strong>{{ c.crr }}</strong></span>
@@ -80,7 +107,7 @@
 
       <!-- Recent Balls Ticker Stream -->
       <div class="recent-balls-bar">
-        <span class="recent-label"><i class="fa-solid fa-bolt"></i> RECENT OVER:</span>
+        <span class="recent-label"><i class="fa-solid fa-bolt-lightning"></i> RECENT OVER:</span>
         <div class="balls-stream">
           @for (ball of c.recentBalls; track $index) {
           <span class="ball-badge" [class]="getBallBadgeClass(ball)">{{ ball }}</span>
@@ -152,7 +179,10 @@
         <div class="tennis-sets-matrix">
           <div class="tennis-team-row" [class.is-serving]="t.server === 'home'">
             <span class="player-name">
-              HOME PLAYER @if (t.server === 'home') { <span class="serve-icon">🎾</span> }
+              HOME PLAYER 
+              @if (t.server === 'home') { 
+                <span class="serve-indicator-badge"><i class="fa-solid fa-circle"></i> SERVING</span> 
+              }
             </span>
             <div class="set-scores">
               @for (s of t.setScores; track s.setNumber) {
@@ -163,7 +193,10 @@
           </div>
           <div class="tennis-team-row" [class.is-serving]="t.server === 'away'">
             <span class="player-name">
-              AWAY PLAYER @if (t.server === 'away') { <span class="serve-icon">🎾</span> }
+              AWAY PLAYER 
+              @if (t.server === 'away') { 
+                <span class="serve-indicator-badge"><i class="fa-solid fa-circle"></i> SERVING</span> 
+              }
             </span>
             <div class="set-scores">
               @for (s of t.setScores; track s.setNumber) {
@@ -218,12 +251,18 @@
     </div>
     }
     }
+    }
 
     <!-- Live Ticker Footer -->
-    @if (latestUpdate(); as update) {
+    @if (m.status === 'LIVE' && latestUpdate(); as update) {
     <div class="update-ticker" [class.ticker-pulse]="scorePulse()">
       <span class="dot-live-pulse"></span>
-      <span>Realtime broadcast update sync: {{ update.timestamp | date:'mediumTime' }}</span>
+      <span>Realtime telemetry sync: {{ update.timestamp | date:'mediumTime' }}</span>
+    </div>
+    } @else if (m.status === 'UPCOMING') {
+    <div class="update-ticker text-upcoming">
+      <i class="fa-regular fa-clock"></i>
+      <span>Realtime telemetry stream will initiate automatically upon kickoff</span>
     </div>
     }
   </div>
@@ -231,7 +270,7 @@
   <!-- NAVIGATION SUB-TABS -->
   <div class="tabs-nav-bar">
     <button class="tab-btn" [class.active]="activeTab() === 'overview'" (click)="setTab('overview')">
-      <i class="fa-solid fa-list-check"></i> Overview & Live
+      <i class="fa-solid fa-list-check"></i> {{ m.status === 'UPCOMING' ? 'Overview & Preview' : 'Overview & Live' }}
     </button>
     <button class="tab-btn" [class.active]="activeTab() === 'stats'" (click)="setTab('stats')">
       <i class="fa-solid fa-chart-column"></i> Statistics
@@ -256,7 +295,37 @@
     @if (activeTab() === 'overview') {
     <div class="telemetry-grid">
 
-      <!-- SPORT-NATIVE LIVE WIDGET CARDS -->
+      <!-- UPCOMING PRE-MATCH OVERVIEW CARD OR SPORT-NATIVE LIVE WIDGET CARDS -->
+      @if (m.status === 'UPCOMING') {
+      <div class="telemetry-card">
+        <div class="card-head">
+          <i class="fa-regular fa-calendar-check"></i>
+          <h3>Pre-Match Fixture Details</h3>
+        </div>
+        <div class="upcoming-details-box">
+          <div class="detail-row">
+            <span class="detail-label">Match Title:</span>
+            <span class="detail-value"><strong>{{ m.name }}</strong></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Sport Category:</span>
+            <span class="detail-value"><i [class]="getSportIcon(m.sport)"></i> {{ m.sport }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Scheduled Kickoff:</span>
+            <span class="detail-value">{{ m.startTime | date:'medium' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="badge-upcoming">SCHEDULED</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Realtime Channel:</span>
+            <code class="spec-code">match:{{ m._id }}</code>
+          </div>
+        </div>
+      </div>
+      } @else {
       @switch (sportCategory()) {
 
       <!-- CRICKET OVERVIEW WIDGETS -->
@@ -283,7 +352,7 @@
             </thead>
             <tbody>
               <tr [class.highlight-row]="c.striker.isStriker">
-                <td>{{ c.striker.name }} *</td>
+                <td><strong>{{ c.striker.name }}</strong> *</td>
                 <td><strong>{{ c.striker.runs }}</strong></td>
                 <td>{{ c.striker.balls }}</td>
                 <td>{{ c.striker.fours }}</td>
@@ -317,7 +386,7 @@
             </thead>
             <tbody>
               <tr>
-                <td>{{ c.bowler.name }}</td>
+                <td><strong>{{ c.bowler.name }}</strong></td>
                 <td>{{ c.bowler.overs }}</td>
                 <td>{{ c.bowler.maidens }}</td>
                 <td>{{ c.bowler.runs }}</td>
@@ -462,12 +531,13 @@
       </div>
       }
       }
+      }
 
       <!-- REALTIME EVENT FEED -->
       <div class="telemetry-card">
         <div class="card-head">
           <i class="fa-solid fa-tower-broadcast"></i>
-          <h3>Real-Time Live Event Feed</h3>
+          <h3>Real-Time Telemetry Feed</h3>
         </div>
 
         <div class="stream-state-box">
@@ -497,10 +567,10 @@
             <i class="fa-solid fa-signal signal-icon"></i>
             @if (m.status === 'LIVE') {
             <h4>Streaming Live Telemetry...</h4>
-            <p>Score changes and match telemetry updates will stream live automatically.</p>
+            <p>Score changes and match events will stream live automatically.</p>
             } @else if (m.status === 'UPCOMING') {
             <h4>Fixture Scheduled</h4>
-            <p>Live stream will initiate automatically upon kickoff.</p>
+            <p>Live telemetry stream will initiate automatically upon kickoff.</p>
             } @else {
             <h4>Fixture Concluded</h4>
             <p>Final score verified and archived.</p>
@@ -520,6 +590,13 @@
         <h3>Detailed Match Statistics</h3>
       </div>
 
+      @if (m.status === 'UPCOMING') {
+      <div class="stream-waiting" style="padding: 40px 20px;">
+        <i class="fa-solid fa-chart-column signal-icon"></i>
+        <h4>Statistics Unavailable</h4>
+        <p>Match statistics will track live automatically once the fixture begins.</p>
+      </div>
+      } @else {
       @switch (sportCategory()) {
       @case ('football') {
       @let f = footballData();
@@ -647,6 +724,7 @@
       </div>
       }
       }
+      }
     </div>
     }
 
@@ -749,6 +827,14 @@
         <i class="fa-solid fa-clock-rotate-left"></i>
         <h3>Match Events Timeline</h3>
       </div>
+
+      @if (m.status === 'UPCOMING') {
+      <div class="stream-waiting" style="padding: 40px 20px;">
+        <i class="fa-solid fa-clock-rotate-left signal-icon"></i>
+        <h4>Timeline Empty</h4>
+        <p>No events recorded yet. Key match events (goals, cards, wickets) will appear live during the fixture.</p>
+      </div>
+      } @else {
       @let f = footballData();
       <div class="timeline-event-list">
         @for (ev of f.events; track ev.minute) {
@@ -761,6 +847,7 @@
         </div>
         }
       </div>
+      }
     </div>
     }
 
