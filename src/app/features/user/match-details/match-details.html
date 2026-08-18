@@ -1,4 +1,4 @@
-<div class="page-container">
+<div class="page-container" [attr.data-sport]="sportCategory()">
   <!-- Breadcrumb Navigation Bar -->
   <div class="breadcrumb-bar">
     <a routerLink="/matches" class="btn-breadcrumb">
@@ -10,7 +10,7 @@
   @if (isLoading()) {
   <div class="state-panel">
     <div class="loading-spinner"></div>
-    <p>Loading match details...</p>
+    <p>Loading sport fixture details...</p>
   </div>
   } @else if (errorMessage()) {
   <div class="error-panel">
@@ -24,8 +24,9 @@
     <a routerLink="/matches" class="btn-secondary">Return to All Matches</a>
   </div>
   } @else if (match(); as m) {
-  <!-- Main Broadcast Scoreboard Header -->
-  <div class="scoreboard-hero" [class.is-live-hero]="m.status === 'LIVE'">
+
+  <!-- DYNAMIC SPORT-NATIVE SCOREBOARD HERO HEADER -->
+  <div class="scoreboard-hero" [class.is-live-hero]="m.status === 'LIVE'" [attr.data-sport-theme]="sportCategory()">
     <div class="hero-top">
       <div class="sport-badge">
         <i [class]="getSportIcon(m.sport)"></i>
@@ -58,30 +59,713 @@
       }
     </div>
 
-    <!-- Live Score Banner (when live or update present) -->
-    @if (latestUpdate(); as update) {
+    <!-- DYNAMIC SPORT SCOREBOARDS -->
+    @switch (sportCategory()) {
+
+    <!-- 1. CRICKET SCOREBOARD HERO -->
+    @case ('cricket') {
+    @let c = cricketData();
+    <div class="sport-scoreboard cricket-hero">
+      <div class="hero-score-main">
+        <div class="score-runs-box" [class.score-pulse]="scorePulse()">
+          <span class="runs-display">{{ c.runs }} / {{ c.wickets }}</span>
+          <span class="overs-display">({{ c.overs }} overs)</span>
+        </div>
+        <div class="cricket-rates-pill">
+          <span class="rate-badge">CRR: <strong>{{ c.crr }}</strong></span>
+          <span class="rate-badge highlight">RRR: <strong>{{ c.rrr }}</strong></span>
+          <span class="rate-badge">Target: <strong>{{ c.target }}</strong></span>
+        </div>
+      </div>
+
+      <!-- Recent Balls Ticker Stream -->
+      <div class="recent-balls-bar">
+        <span class="recent-label"><i class="fa-solid fa-bolt"></i> RECENT OVER:</span>
+        <div class="balls-stream">
+          @for (ball of c.recentBalls; track $index) {
+          <span class="ball-badge" [class]="getBallBadgeClass(ball)">{{ ball }}</span>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- 2. FOOTBALL SCOREBOARD HERO -->
+    @case ('football') {
+    @let f = footballData();
+    <div class="sport-scoreboard football-hero">
+      <div class="hero-score-main">
+        <div class="team-score-card">
+          <span class="team-label">HOME</span>
+          <span class="score-digit" [class.score-pulse]="scorePulse()">{{ homeScore() }}</span>
+        </div>
+        <div class="football-clock-center">
+          <span class="football-time-badge">
+            <i class="fa-regular fa-clock"></i> {{ f.minute }}
+          </span>
+          <span class="match-phase-label">{{ f.half }}</span>
+        </div>
+        <div class="team-score-card">
+          <span class="team-label">AWAY</span>
+          <span class="score-digit" [class.score-pulse]="scorePulse()">{{ awayScore() }}</span>
+        </div>
+      </div>
+
+      <!-- Quick Possession Bar -->
+      <div class="quick-possession-bar">
+        <span class="poss-text">{{ f.possessionHome }}%</span>
+        <div class="poss-track">
+          <div class="poss-fill-home" [style.width.%]="f.possessionHome"></div>
+        </div>
+        <span class="poss-text">{{ f.possessionAway }}%</span>
+      </div>
+    </div>
+    }
+
+    <!-- 3. BASKETBALL SCOREBOARD HERO -->
+    @case ('basketball') {
+    @let b = basketballData();
+    <div class="sport-scoreboard basketball-hero">
+      <div class="hero-score-main">
+        <div class="team-score-card">
+          <span class="team-label">HOME</span>
+          <span class="score-digit" [class.score-pulse]="scorePulse()">{{ homeScore() }}</span>
+        </div>
+        <div class="bball-clock-center">
+          <span class="quarter-tag">{{ b.quarter }}</span>
+          <span class="game-clock">{{ b.gameClock }}</span>
+          <span class="shot-clock-pill">SHOT CLOCK: {{ b.shotClock }}s</span>
+        </div>
+        <div class="team-score-card">
+          <span class="team-label">AWAY</span>
+          <span class="score-digit" [class.score-pulse]="scorePulse()">{{ awayScore() }}</span>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- 4. TENNIS SCOREBOARD HERO -->
+    @case ('tennis') {
+    @let t = tennisData();
+    <div class="sport-scoreboard tennis-hero">
+      <div class="hero-score-main">
+        <div class="tennis-sets-matrix">
+          <div class="tennis-team-row" [class.is-serving]="t.server === 'home'">
+            <span class="player-name">
+              HOME PLAYER @if (t.server === 'home') { <span class="serve-icon">🎾</span> }
+            </span>
+            <div class="set-scores">
+              @for (s of t.setScores; track s.setNumber) {
+              <span class="set-box">{{ s.home }}</span>
+              }
+            </div>
+            <span class="live-game-point" [class.score-pulse]="scorePulse()">{{ t.currentGameHome }}</span>
+          </div>
+          <div class="tennis-team-row" [class.is-serving]="t.server === 'away'">
+            <span class="player-name">
+              AWAY PLAYER @if (t.server === 'away') { <span class="serve-icon">🎾</span> }
+            </span>
+            <div class="set-scores">
+              @for (s of t.setScores; track s.setNumber) {
+              <span class="set-box">{{ s.away }}</span>
+              }
+            </div>
+            <span class="live-game-point" [class.score-pulse]="scorePulse()">{{ t.currentGameAway }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- 5. ESPORTS SCOREBOARD HERO -->
+    @case ('esports') {
+    @let e = esportsData();
+    <div class="sport-scoreboard esports-hero">
+      <div class="hero-score-main">
+        <div class="esports-map-banner">
+          <span class="map-title"><i class="fa-solid fa-map-location-dot"></i> {{ e.currentMap }}</span>
+          <span class="esports-phase-badge">{{ e.phase }}</span>
+        </div>
+        <div class="esports-score-row">
+          <div class="team-score-card">
+            <span class="team-label">HOME TEAM</span>
+            <span class="score-digit" [class.score-pulse]="scorePulse()">{{ e.roundScoreHome }}</span>
+            <span class="map-score-pill">MAPS: {{ e.mapScoreHome }}</span>
+          </div>
+          <div class="esports-vs">VS</div>
+          <div class="team-score-card">
+            <span class="team-label">AWAY TEAM</span>
+            <span class="score-digit" [class.score-pulse]="scorePulse()">{{ e.roundScoreAway }}</span>
+            <span class="map-score-pill">MAPS: {{ e.mapScoreAway }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- DEFAULT FALLBACK SCOREBOARD -->
+    @default {
     <div class="live-score-display">
       <div class="team-score-card">
         <span class="team-label">HOME</span>
-        <span class="score-digit" [class.score-pulse]="scorePulse()">{{ update.score.home }}</span>
+        <span class="score-digit" [class.score-pulse]="scorePulse()">{{ homeScore() }}</span>
       </div>
       <div class="score-divider" [class.score-pulse]="scorePulse()">:</div>
       <div class="team-score-card">
         <span class="team-label">AWAY</span>
-        <span class="score-digit" [class.score-pulse]="scorePulse()">{{ update.score.away }}</span>
+        <span class="score-digit" [class.score-pulse]="scorePulse()">{{ awayScore() }}</span>
       </div>
     </div>
+    }
+    }
+
+    <!-- Live Ticker Footer -->
+    @if (latestUpdate(); as update) {
     <div class="update-ticker" [class.ticker-pulse]="scorePulse()">
       <span class="dot-live-pulse"></span>
-      <span>Last score update at {{ update.timestamp | date:'mediumTime' }}</span>
+      <span>Realtime broadcast update sync: {{ update.timestamp | date:'mediumTime' }}</span>
     </div>
     }
   </div>
 
-  <!-- Live Feed Grid -->
-  <div class="telemetry-grid">
-    <!-- Connection Status Card (Admin Only - Visually Demarcated) -->
+  <!-- NAVIGATION SUB-TABS -->
+  <div class="tabs-nav-bar">
+    <button class="tab-btn" [class.active]="activeTab() === 'overview'" (click)="setTab('overview')">
+      <i class="fa-solid fa-list-check"></i> Overview & Live
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'stats'" (click)="setTab('stats')">
+      <i class="fa-solid fa-chart-column"></i> Statistics
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'lineups'" (click)="setTab('lineups')">
+      <i class="fa-solid fa-users"></i> Lineups & Squads
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'timeline'" (click)="setTab('timeline')">
+      <i class="fa-solid fa-clock-rotate-left"></i> Match Timeline
+    </button>
     @if (isAdmin()) {
+    <button class="tab-btn admin-tab" [class.active]="activeTab() === 'admin'" (click)="setTab('admin')">
+      <i class="fa-solid fa-code"></i> Socket Specs
+    </button>
+    }
+  </div>
+
+  <!-- TAB CONTENT PANELS -->
+  <div class="tab-content-area">
+
+    <!-- TAB 1: OVERVIEW & LIVE FEED -->
+    @if (activeTab() === 'overview') {
+    <div class="telemetry-grid">
+
+      <!-- SPORT-NATIVE LIVE WIDGET CARDS -->
+      @switch (sportCategory()) {
+
+      <!-- CRICKET OVERVIEW WIDGETS -->
+      @case ('cricket') {
+      @let c = cricketData();
+      <div class="telemetry-card">
+        <div class="card-head">
+          <i class="fa-solid fa-baseball-bat-ball"></i>
+          <h3>Current Batsmen & Bowler</h3>
+        </div>
+
+        <div class="widget-block">
+          <h4 class="sub-head">BATSMEN ON CREASE</h4>
+          <table class="sport-table">
+            <thead>
+              <tr>
+                <th>Batter</th>
+                <th>R</th>
+                <th>B</th>
+                <th>4s</th>
+                <th>6s</th>
+                <th>SR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr [class.highlight-row]="c.striker.isStriker">
+                <td>{{ c.striker.name }} *</td>
+                <td><strong>{{ c.striker.runs }}</strong></td>
+                <td>{{ c.striker.balls }}</td>
+                <td>{{ c.striker.fours }}</td>
+                <td>{{ c.striker.sixes }}</td>
+                <td>{{ c.striker.strikeRate }}</td>
+              </tr>
+              <tr>
+                <td>{{ c.nonStriker.name }}</td>
+                <td><strong>{{ c.nonStriker.runs }}</strong></td>
+                <td>{{ c.nonStriker.balls }}</td>
+                <td>{{ c.nonStriker.fours }}</td>
+                <td>{{ c.nonStriker.sixes }}</td>
+                <td>{{ c.nonStriker.strikeRate }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="widget-block">
+          <h4 class="sub-head">CURRENT BOWLER</h4>
+          <table class="sport-table">
+            <thead>
+              <tr>
+                <th>Bowler</th>
+                <th>O</th>
+                <th>M</th>
+                <th>R</th>
+                <th>W</th>
+                <th>Econ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ c.bowler.name }}</td>
+                <td>{{ c.bowler.overs }}</td>
+                <td>{{ c.bowler.maidens }}</td>
+                <td>{{ c.bowler.runs }}</td>
+                <td><strong>{{ c.bowler.wickets }}</strong></td>
+                <td>{{ c.bowler.economy }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cricket-partner-card">
+          <div class="partner-row">
+            <span>Partnership: <strong>{{ c.partnershipRuns }} runs ({{ c.partnershipBalls }}b)</strong></span>
+            <span>Last Wicket: <em>{{ c.lastWicket }}</em></span>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- FOOTBALL OVERVIEW WIDGETS -->
+      @case ('football') {
+      @let f = footballData();
+      <div class="telemetry-card">
+        <div class="card-head">
+          <i class="fa-solid fa-futbol"></i>
+          <h3>Tactical Pitch Formations</h3>
+        </div>
+        <div class="pitch-container">
+          <div class="pitch-side home-side">
+            <span class="formation-tag">HOME: {{ f.formationHome }}</span>
+            <div class="pitch-nodes">
+              <span class="pitch-node gk">GK</span>
+              <span class="pitch-node def">CB</span>
+              <span class="pitch-node def">CB</span>
+              <span class="pitch-node mid">CM</span>
+              <span class="pitch-node mid">CAM</span>
+              <span class="pitch-node fwd">ST</span>
+            </div>
+          </div>
+          <div class="pitch-half-line"></div>
+          <div class="pitch-side away-side">
+            <span class="formation-tag">AWAY: {{ f.formationAway }}</span>
+            <div class="pitch-nodes">
+              <span class="pitch-node fwd">ST</span>
+              <span class="pitch-node mid">CAM</span>
+              <span class="pitch-node mid">CM</span>
+              <span class="pitch-node def">CB</span>
+              <span class="pitch-node def">CB</span>
+              <span class="pitch-node gk">GK</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- BASKETBALL OVERVIEW WIDGETS -->
+      @case ('basketball') {
+      @let b = basketballData();
+      <div class="telemetry-card">
+        <div class="card-head">
+          <i class="fa-solid fa-basketball"></i>
+          <h3>Quarter Scores Breakdown</h3>
+        </div>
+        <table class="sport-table matrix-table">
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Q1</th>
+              <th>Q2</th>
+              <th>Q3</th>
+              <th>Q4</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>HOME</strong></td>
+              <td>{{ b.q1.home }}</td>
+              <td>{{ b.q2.home }}</td>
+              <td>{{ b.q3.home }}</td>
+              <td>{{ b.q4.home }}</td>
+              <td><strong class="text-accent">{{ homeScore() }}</strong></td>
+            </tr>
+            <tr>
+              <td><strong>AWAY</strong></td>
+              <td>{{ b.q1.away }}</td>
+              <td>{{ b.q2.away }}</td>
+              <td>{{ b.q3.away }}</td>
+              <td>{{ b.q4.away }}</td>
+              <td><strong class="text-accent">{{ awayScore() }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      }
+
+      <!-- TENNIS OVERVIEW WIDGETS -->
+      @case ('tennis') {
+      @let t = tennisData();
+      <div class="telemetry-card">
+        <div class="card-head">
+          <i class="fa-solid fa-table-tennis-paddle-ball"></i>
+          <h3>Match Key Metrics</h3>
+        </div>
+        <div class="tennis-stats-grid">
+          <div class="metric-box">
+            <span class="metric-val">{{ t.acesHome }} / {{ t.acesAway }}</span>
+            <span class="metric-lbl">Aces (Home / Away)</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-val">{{ t.doubleFaultsHome }} / {{ t.doubleFaultsAway }}</span>
+            <span class="metric-lbl">Double Faults</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-val">{{ t.breakPointsWonHome }} vs {{ t.breakPointsWonAway }}</span>
+            <span class="metric-lbl">Break Points Won</span>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- ESPORTS OVERVIEW WIDGETS -->
+      @case ('esports') {
+      @let e = esportsData();
+      <div class="telemetry-card">
+        <div class="card-head">
+          <i class="fa-solid fa-gamepad"></i>
+          <h3>Economy & Team Loadout</h3>
+        </div>
+        <div class="eco-grid">
+          <div class="eco-card home-eco">
+            <h4>HOME ECONOMY</h4>
+            <div class="eco-amount">{{ e.economyHome }}</div>
+            <div class="loadout-desc">{{ e.loadoutHome }}</div>
+          </div>
+          <div class="eco-card away-eco">
+            <h4>AWAY ECONOMY</h4>
+            <div class="eco-amount">{{ e.economyAway }}</div>
+            <div class="loadout-desc">{{ e.loadoutAway }}</div>
+          </div>
+        </div>
+      </div>
+      }
+      }
+
+      <!-- REALTIME EVENT FEED -->
+      <div class="telemetry-card">
+        <div class="card-head">
+          <i class="fa-solid fa-tower-broadcast"></i>
+          <h3>Real-Time Live Event Feed</h3>
+        </div>
+
+        <div class="stream-state-box">
+          @if (updatesHistory().length > 0) {
+          <div class="feed-timeline-list">
+            @for (update of updatesHistory(); track update.timestamp) {
+            @let item = formatFeedItem(update);
+            <div class="payload-feed-item" [class.latest-feed-item]="update === latestUpdate()">
+              <div class="feed-header">
+                <div class="feed-event-tag">
+                  <i [class]="item.icon"></i>
+                  <span class="feed-badge" [class]="item.badgeClass">{{ item.badge }}</span>
+                </div>
+                <span class="feed-time">{{ update.timestamp | date:'mediumTime' }}</span>
+              </div>
+              <p class="feed-desc">
+                {{ item.headline }}
+              </p>
+              <p class="feed-sub-detail">
+                {{ item.detail }}
+              </p>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="stream-waiting">
+            <i class="fa-solid fa-signal signal-icon"></i>
+            @if (m.status === 'LIVE') {
+            <h4>Streaming Live Telemetry...</h4>
+            <p>Score changes and match telemetry updates will stream live automatically.</p>
+            } @else if (m.status === 'UPCOMING') {
+            <h4>Fixture Scheduled</h4>
+            <p>Live stream will initiate automatically upon kickoff.</p>
+            } @else {
+            <h4>Fixture Concluded</h4>
+            <p>Final score verified and archived.</p>
+            }
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- TAB 2: STATISTICS -->
+    @if (activeTab() === 'stats') {
+    <div class="telemetry-card">
+      <div class="card-head">
+        <i class="fa-solid fa-chart-column"></i>
+        <h3>Detailed Match Statistics</h3>
+      </div>
+
+      @switch (sportCategory()) {
+      @case ('football') {
+      @let f = footballData();
+      <div class="stats-bars-container">
+        <div class="stat-row">
+          <span class="stat-val-home">{{ f.possessionHome }}%</span>
+          <span class="stat-name">Possession</span>
+          <span class="stat-val-away">{{ f.possessionAway }}%</span>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill-home" [style.width.%]="f.possessionHome"></div>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ f.shotsHome }}</span>
+          <span class="stat-name">Total Shots</span>
+          <span class="stat-val-away">{{ f.shotsAway }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ f.shotsOnTargetHome }}</span>
+          <span class="stat-name">Shots on Target</span>
+          <span class="stat-val-away">{{ f.shotsOnTargetAway }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ f.cornersHome }}</span>
+          <span class="stat-name">Corner Kicks</span>
+          <span class="stat-val-away">{{ f.cornersAway }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ f.foulsHome }}</span>
+          <span class="stat-name">Fouls Committed</span>
+          <span class="stat-val-away">{{ f.foulsAway }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ f.yellowCardsHome }}</span>
+          <span class="stat-name">Yellow Cards</span>
+          <span class="stat-val-away">{{ f.yellowCardsAway }}</span>
+        </div>
+      </div>
+      }
+
+      @case ('basketball') {
+      @let b = basketballData();
+      <div class="stats-bars-container">
+        <div class="stat-row">
+          <span class="stat-val-home">{{ b.fgPctHome }}%</span>
+          <span class="stat-name">Field Goal % (FG%)</span>
+          <span class="stat-val-away">{{ b.fgPctAway }}%</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ b.threePtPctHome }}%</span>
+          <span class="stat-name">3-Point % (3PT%)</span>
+          <span class="stat-val-away">{{ b.threePtPctAway }}%</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ b.ftPctHome }}%</span>
+          <span class="stat-name">Free Throw % (FT%)</span>
+          <span class="stat-val-away">{{ b.ftPctAway }}%</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ b.reboundsHome }}</span>
+          <span class="stat-name">Total Rebounds</span>
+          <span class="stat-val-away">{{ b.reboundsAway }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ b.assistsHome }}</span>
+          <span class="stat-name">Assists</span>
+          <span class="stat-val-away">{{ b.assistsAway }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-val-home">{{ b.turnoversHome }}</span>
+          <span class="stat-name">Turnovers</span>
+          <span class="stat-val-away">{{ b.turnoversAway }}</span>
+        </div>
+      </div>
+      }
+
+      @case ('tennis') {
+      @let t = tennisData();
+      <div class="stats-bars-container">
+        <div class="stat-row">
+          <span class="stat-val-home">{{ t.firstServePctHome }}%</span>
+          <span class="stat-name">1st Serve %</span>
+          <span class="stat-val-away">{{ t.firstServePctAway }}%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-val-home">{{ t.acesHome }}</span>
+          <span class="stat-name">Aces</span>
+          <span class="stat-val-away">{{ t.acesAway }}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-val-home">{{ t.unforcedErrorsHome }}</span>
+          <span class="stat-name">Unforced Errors</span>
+          <span class="stat-val-away">{{ t.unforcedErrorsAway }}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-val-home">{{ t.totalPointsHome }}</span>
+          <span class="stat-name">Total Points Won</span>
+          <span class="stat-val-away">{{ t.totalPointsAway }}</span>
+        </div>
+      </div>
+      }
+
+      @default {
+      <div class="stats-bars-container">
+        <div class="stat-row">
+          <span class="stat-val-home">62%</span>
+          <span class="stat-name">Match Control</span>
+          <span class="stat-val-away">38%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-val-home">14</span>
+          <span class="stat-name">Attack Chances</span>
+          <span class="stat-val-away">9</span>
+        </div>
+      </div>
+      }
+      }
+    </div>
+    }
+
+    <!-- TAB 3: LINEUPS & SQUADS -->
+    @if (activeTab() === 'lineups') {
+    <div class="telemetry-card">
+      <div class="card-head">
+        <i class="fa-solid fa-users"></i>
+        <h3>Player Performance & Lineups</h3>
+      </div>
+
+      @switch (sportCategory()) {
+      @case ('basketball') {
+      @let b = basketballData();
+      <table class="sport-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Team</th>
+            <th>PTS</th>
+            <th>REB</th>
+            <th>AST</th>
+            <th>MIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of b.topPlayers; track p.name) {
+          <tr>
+            <td><strong>{{ p.name }}</strong></td>
+            <td><span class="team-badge" [class.home-team]="p.team === 'home'">{{ p.team | uppercase }}</span></td>
+            <td><strong>{{ p.pts }}</strong></td>
+            <td>{{ p.reb }}</td>
+            <td>{{ p.ast }}</td>
+            <td>{{ p.min }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+
+      @case ('esports') {
+      @let e = esportsData();
+      <table class="sport-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Team</th>
+            <th>K</th>
+            <th>D</th>
+            <th>A</th>
+            <th>ADR</th>
+            <th>HS%</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of e.playerStats; track p.name) {
+          <tr>
+            <td><strong>{{ p.name }}</strong></td>
+            <td><span class="team-badge" [class.home-team]="p.team === 'home'">{{ p.team | uppercase }}</span></td>
+            <td><strong class="text-accent">{{ p.kills }}</strong></td>
+            <td>{{ p.deaths }}</td>
+            <td>{{ p.assists }}</td>
+            <td>{{ p.adr }}</td>
+            <td>{{ p.hsPct }}%</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+
+      @default {
+      @let f = footballData();
+      <div class="lineup-dual-grid">
+        <div class="lineup-column">
+          <h4 class="sub-head">HOME SQUAD</h4>
+          <ul class="lineup-list">
+            @for (player of f.lineupHome; track player) {
+            <li><i class="fa-solid fa-shirt"></i> {{ player }}</li>
+            }
+          </ul>
+        </div>
+        <div class="lineup-column">
+          <h4 class="sub-head">AWAY SQUAD</h4>
+          <ul class="lineup-list">
+            @for (player of f.lineupAway; track player) {
+            <li><i class="fa-solid fa-shirt"></i> {{ player }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+      }
+      }
+    </div>
+    }
+
+    <!-- TAB 4: MATCH TIMELINE -->
+    @if (activeTab() === 'timeline') {
+    <div class="telemetry-card">
+      <div class="card-head">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <h3>Match Events Timeline</h3>
+      </div>
+      @let f = footballData();
+      <div class="timeline-event-list">
+        @for (ev of f.events; track ev.minute) {
+        <div class="timeline-item" [class]="getEventBadgeClass(ev.type)">
+          <span class="event-time">{{ ev.minute }}</span>
+          <div class="event-body">
+            <span class="event-player"><strong>{{ ev.player }}</strong> ({{ ev.team | uppercase }})</span>
+            @if (ev.detail) { <span class="event-detail">{{ ev.detail }}</span> }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- TAB 5: ADMIN WEBSOCKET SPECS -->
+    @if (activeTab() === 'admin' && isAdmin()) {
     <div class="telemetry-card admin-card">
       <div class="card-head">
         <i class="fa-solid fa-code"></i>
@@ -120,61 +804,6 @@
     </div>
     }
 
-    <!-- Live Match Feed / Event Timeline Card -->
-    <div class="telemetry-card">
-      <div class="card-head">
-        <i class="fa-solid fa-tower-broadcast"></i>
-        <h3>Live Match Feed</h3>
-      </div>
-
-      <div class="stream-state-box">
-        @if (updatesHistory().length > 0) {
-        <div class="feed-timeline-list">
-          @for (update of updatesHistory(); track update.timestamp) {
-          <div class="payload-feed-item" [class.latest-feed-item]="update === latestUpdate()">
-            <div class="feed-header">
-              <div class="feed-event-tag">
-                <i [class]="getEventIcon(m.sport)"></i>
-                <span class="feed-badge">SCORE UPDATE</span>
-              </div>
-              <span class="feed-time">{{ update.timestamp | date:'mediumTime' }}</span>
-            </div>
-            <p class="feed-desc">
-              Current Score: <strong>Home {{ update.score.home }} - {{ update.score.away }} Away</strong>
-            </p>
-          </div>
-          }
-        </div>
-        } @else if (latestUpdate(); as update) {
-        <div class="payload-feed-item latest-feed-item">
-          <div class="feed-header">
-            <div class="feed-event-tag">
-              <i [class]="getEventIcon(m.sport)"></i>
-              <span class="feed-badge">SCORE UPDATE</span>
-            </div>
-            <span class="feed-time">{{ update.timestamp | date:'mediumTime' }}</span>
-          </div>
-          <p class="feed-desc">
-            Current Score: <strong>Home {{ update.score.home }} - {{ update.score.away }} Away</strong>
-          </p>
-        </div>
-        } @else {
-        <div class="stream-waiting">
-          <i class="fa-solid fa-signal signal-icon"></i>
-          @if (m.status === 'LIVE') {
-          <h4>Waiting for live updates...</h4>
-          <p>Real-time score changes and match events will appear here automatically.</p>
-          } @else if (m.status === 'UPCOMING') {
-          <h4>Match Not Started</h4>
-          <p>Live match feed will activate automatically when the match kicks off.</p>
-          } @else {
-          <h4>Match Concluded</h4>
-          <p>Match finished. Final score recorded.</p>
-          }
-        </div>
-        }
-      </div>
-    </div>
   </div>
   }
 </div>

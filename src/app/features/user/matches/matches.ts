@@ -9,6 +9,7 @@ import {
 import { Auth } from '../../../core/services/auth';
 
 export type FilterStatus = 'ALL' | 'LIVE' | 'UPCOMING' | 'COMPLETED';
+export type SortOption = 'STATUS' | 'NEWEST_CREATED' | 'TIME_ASC' | 'TIME_DESC' | 'SPORT' | 'NAME';
 
 @Component({
   selector: 'app-user-matches',
@@ -26,6 +27,7 @@ export class Matches implements OnInit {
 
   readonly activeFilter = signal<FilterStatus>('ALL');
   readonly searchQuery = signal<string>('');
+  readonly sortBy = signal<SortOption>('STATUS');
 
   readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
 
@@ -33,14 +35,40 @@ export class Matches implements OnInit {
     const matches = this.matches();
     const filter = this.activeFilter();
     const query = this.searchQuery().toLowerCase().trim();
+    const sort = this.sortBy();
 
-    return matches.filter((match) => {
+    const result = matches.filter((match) => {
       const matchesFilter = filter === 'ALL' || match.status === filter;
       const matchesSearch =
         !query ||
         match.name.toLowerCase().includes(query) ||
         match.sport.toLowerCase().includes(query);
       return matchesFilter && matchesSearch;
+    });
+
+    const statusPriority: Record<string, number> = { LIVE: 1, UPCOMING: 2, COMPLETED: 3 };
+
+    return result.sort((a, b) => {
+      const createdA = new Date(a.createdAt || a.startTime).getTime();
+      const createdB = new Date(b.createdAt || b.startTime).getTime();
+
+      if (sort === 'STATUS') {
+        const priorityA = statusPriority[a.status] ?? 4;
+        const priorityB = statusPriority[b.status] ?? 4;
+        if (priorityA !== priorityB) return priorityA - priorityB;
+        return createdB - createdA;
+      } else if (sort === 'NEWEST_CREATED') {
+        return createdB - createdA;
+      } else if (sort === 'TIME_ASC') {
+        return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+      } else if (sort === 'TIME_DESC') {
+        return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+      } else if (sort === 'SPORT') {
+        return a.sport.localeCompare(b.sport);
+      } else if (sort === 'NAME') {
+        return a.name.localeCompare(b.name);
+      }
+      return 0;
     });
   });
 
@@ -74,6 +102,10 @@ export class Matches implements OnInit {
 
   setFilter(filter: FilterStatus): void {
     this.activeFilter.set(filter);
+  }
+
+  setSort(sort: SortOption): void {
+    this.sortBy.set(sort);
   }
 
   getSportIcon(sport: string): string {

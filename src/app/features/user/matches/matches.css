@@ -158,6 +158,44 @@
   outline: none;
 }
 
+.sort-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+}
+
+.sort-icon {
+  font-size: 13px;
+  color: var(--accent-primary);
+}
+
+.sort-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sort-select {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  padding-right: 4px;
+}
+
+.sort-select option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
 .btn-clear-search {
   position: absolute;
   right: 8px;

@@ -10,6 +10,8 @@ export interface MatchUpdate {
     };
     status: 'LIVE' | 'COMPLETED';
     timestamp: number;
+    dataType?: 'SCORE' | 'FULL' | 'STATISTICS';
+    meta?: Record<string, any>;
 }
 
 @Injectable({

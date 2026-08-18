@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { DatePipe, UpperCasePipe } from '@angular/common';
 import {
   Match,
   MatchService,
@@ -16,10 +16,30 @@ import {
 
 import { MatchUpdate, RealtimeService } from '../../../core/services/realtime';
 import { Auth } from '../../../core/services/auth';
+import {
+  BasketballData,
+  CricketData,
+  EsportsData,
+  FootballData,
+  FormattedFeedItem,
+  GenericData,
+  SportCategory,
+  TennisData,
+  formatSportFeedItem,
+  generateBasketballTelemetry,
+  generateCricketTelemetry,
+  generateEsportsTelemetry,
+  generateFootballTelemetry,
+  generateGenericTelemetry,
+  generateTennisTelemetry,
+  normalizeSport,
+} from '../../../core/models/sport-details.model';
+
+export type DetailTab = 'overview' | 'stats' | 'lineups' | 'timeline' | 'admin';
 
 @Component({
   selector: 'app-match-details',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, UpperCasePipe, RouterLink],
   templateUrl: './match-details.html',
   styleUrl: './match-details.css',
 })
@@ -37,8 +57,50 @@ export class MatchDetails implements OnInit, OnDestroy {
   readonly latestUpdate = signal<MatchUpdate | null>(null);
   readonly updatesHistory = signal<MatchUpdate[]>([]);
   readonly scorePulse = signal<boolean>(false);
+  readonly activeTab = signal<DetailTab>('overview');
 
   readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
+
+  readonly sportCategory = computed<SportCategory>(() => {
+    return normalizeSport(this.match()?.sport);
+  });
+
+  readonly homeScore = computed(() => {
+    return this.latestUpdate()?.score.home ?? 2;
+  });
+
+  readonly awayScore = computed(() => {
+    return this.latestUpdate()?.score.away ?? 1;
+  });
+
+  readonly cricketData = computed<CricketData>(() => {
+    const meta = (this.latestUpdate() as any)?.meta;
+    return generateCricketTelemetry(this.homeScore(), this.awayScore(), meta);
+  });
+
+  readonly footballData = computed<FootballData>(() => {
+    const meta = (this.latestUpdate() as any)?.meta;
+    return generateFootballTelemetry(this.homeScore(), this.awayScore(), meta);
+  });
+
+  readonly basketballData = computed<BasketballData>(() => {
+    const meta = (this.latestUpdate() as any)?.meta;
+    return generateBasketballTelemetry(this.homeScore(), this.awayScore(), meta);
+  });
+
+  readonly tennisData = computed<TennisData>(() => {
+    const meta = (this.latestUpdate() as any)?.meta;
+    return generateTennisTelemetry(this.homeScore(), this.awayScore(), meta);
+  });
+
+  readonly esportsData = computed<EsportsData>(() => {
+    const meta = (this.latestUpdate() as any)?.meta;
+    return generateEsportsTelemetry(this.homeScore(), this.awayScore(), meta);
+  });
+
+  readonly genericData = computed<GenericData>(() => {
+    return generateGenericTelemetry(this.homeScore(), this.awayScore());
+  });
 
   private unbindListeners: Array<() => void> = [];
   private pulseTimeoutId: any = null;
@@ -101,6 +163,10 @@ export class MatchDetails implements OnInit, OnDestroy {
     this.realtimeService.connect();
   }
 
+  setTab(tab: DetailTab): void {
+    this.activeTab.set(tab);
+  }
+
   private triggerScorePulse(): void {
     if (this.pulseTimeoutId) {
       clearTimeout(this.pulseTimeoutId);
@@ -147,6 +213,25 @@ export class MatchDetails implements OnInit, OnDestroy {
     if (s.includes('basket')) return 'fa-solid fa-basketball';
     if (s.includes('tennis')) return 'fa-solid fa-table-tennis-paddle-ball';
     return 'fa-solid fa-bolt';
+  }
+
+  formatFeedItem(update: MatchUpdate): FormattedFeedItem {
+    return formatSportFeedItem(update, this.sportCategory());
+  }
+
+  getBallBadgeClass(ball: string): string {
+    if (ball === 'W') return 'ball-wicket';
+    if (ball === '6') return 'ball-six';
+    if (ball === '4') return 'ball-four';
+    if (ball.includes('wd') || ball.includes('nb')) return 'ball-extra';
+    return 'ball-normal';
+  }
+
+  getEventBadgeClass(type: string): string {
+    if (type === 'goal') return 'event-goal';
+    if (type === 'yellow_card') return 'event-yellow';
+    if (type === 'red_card') return 'event-red';
+    return 'event-sub';
   }
 
   ngOnDestroy(): void {

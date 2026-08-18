@@ -80,7 +80,7 @@ export class Matches implements OnInit {
     const filter = this.activeFilter();
     const query = this.searchQuery().toLowerCase().trim();
 
-    return matches.filter((match) => {
+    const filtered = matches.filter((match) => {
       const matchesFilter =
         filter === 'ALL' || match.status === filter;
       const matchesSearch =
@@ -88,6 +88,17 @@ export class Matches implements OnInit {
         match.name.toLowerCase().includes(query) ||
         match.sport.toLowerCase().includes(query);
       return matchesFilter && matchesSearch;
+    });
+
+    const statusPriority: Record<string, number> = { LIVE: 1, UPCOMING: 2, COMPLETED: 3 };
+
+    return filtered.sort((a, b) => {
+      const priorityA = statusPriority[a.status] ?? 4;
+      const priorityB = statusPriority[b.status] ?? 4;
+      if (priorityA !== priorityB) return priorityA - priorityB;
+      const createdA = new Date(a.createdAt || a.startTime).getTime();
+      const createdB = new Date(b.createdAt || b.startTime).getTime();
+      return createdB - createdA;
     });
   });
 
@@ -315,7 +326,11 @@ export class Matches implements OnInit {
     const formValue = this.matchForm.getRawValue();
 
     this.matchService.createMatch(formValue).subscribe({
-      next: () => {
+      next: (response) => {
+        if (response?.data) {
+          this.matches.update((prev) => [response.data, ...prev]);
+        }
+
         this.matchForm.reset({
           name: '',
           sport: '',
