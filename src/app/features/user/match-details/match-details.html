@@ -3,25 +3,25 @@
   <div class="breadcrumb-bar">
     <a routerLink="/matches" class="btn-breadcrumb">
       <i class="fa-solid fa-arrow-left"></i>
-      <span>Back to Directory</span>
+      <span>Back to Matches</span>
     </a>
   </div>
 
   @if (isLoading()) {
   <div class="state-panel">
     <div class="loading-spinner"></div>
-    <p>Establishing match stream connection...</p>
+    <p>Loading match details...</p>
   </div>
   } @else if (errorMessage()) {
   <div class="error-panel">
     <div class="error-content">
       <i class="fa-solid fa-triangle-exclamation error-icon"></i>
       <div class="error-text">
-        <h4>Fixture Not Found</h4>
+        <h4>Match Not Found</h4>
         <p>{{ errorMessage() }}</p>
       </div>
     </div>
-    <a routerLink="/matches" class="btn-secondary">Return to Matches Directory</a>
+    <a routerLink="/matches" class="btn-secondary">Return to All Matches</a>
   </div>
   } @else if (match(); as m) {
   <!-- Main Broadcast Scoreboard Header -->
@@ -73,12 +73,12 @@
     </div>
     <div class="update-ticker">
       <span class="dot-live-pulse"></span>
-      <span>Live payload received at {{ update.timestamp | date:'mediumTime' }}</span>
+      <span>Last score update at {{ update.timestamp | date:'mediumTime' }}</span>
     </div>
     }
   </div>
 
-  <!-- Telemetry & Stream Grid -->
+  <!-- Live Feed Grid -->
   <div class="telemetry-grid">
     <!-- Connection Status Card (Admin Only) -->
     @if (isAdmin()) {
@@ -121,7 +121,7 @@
     <div class="telemetry-card">
       <div class="card-head">
         <i class="fa-solid fa-tower-broadcast"></i>
-        <h3>Live Broadcast Telemetry</h3>
+        <h3>Live Match Feed</h3>
       </div>
 
       <div class="stream-state-box">
@@ -137,14 +137,14 @@
         <div class="stream-waiting">
           <i class="fa-solid fa-signal signal-icon"></i>
           @if (m.status === 'LIVE') {
-          <h4>Listening for live telemetry...</h4>
-          <p>Real-time events will appear automatically when published to channel <code>match:{{ matchId() }}</code></p>
+          <h4>Waiting for live updates...</h4>
+          <p>Real-time score changes and match events will appear here automatically.</p>
           } @else if (m.status === 'UPCOMING') {
           <h4>Match Not Started</h4>
-          <p>Telemetry stream will activate automatically when the fixture kicks off.</p>
+          <p>Live match feed will activate automatically when the match kicks off.</p>
           } @else {
           <h4>Match Concluded</h4>
-          <p>Stream closed. Final score recorded in database.</p>
+          <p>Match finished. Final score recorded.</p>
           }
         </div>
         }

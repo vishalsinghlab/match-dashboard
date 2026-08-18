@@ -2,7 +2,7 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-main">
-      <h1 class="page-title">Match Directory</h1>
+      <h1 class="page-title">Match Center</h1>
       <p class="page-subtitle">Real-time score updates, live match streams, and upcoming schedules across sports.</p>
     </div>
     
@@ -71,7 +71,7 @@
       </div>
       <div class="metric-body">
         <span class="metric-val text-completed">{{ completedCount() }}</span>
-        <span class="metric-subtext">Concluded match archives</span>
+        <span class="metric-subtext">Completed matches & results</span>
       </div>
     </button>
   </div>
@@ -147,12 +147,12 @@
       <div class="empty-icon-box">
         <i class="fa-solid fa-trophy"></i>
       </div>
-      <h3>No Fixtures Found</h3>
+      <h3>No Matches Found</h3>
       <p>
         @if (searchQuery() || activeFilter() !== 'ALL') {
           No matches match your search criteria or selected filter.
         } @else {
-          No sports fixtures are available at this moment.
+          No sports matches are available at this moment.
         }
       </p>
       @if (searchQuery() || activeFilter() !== 'ALL') {
