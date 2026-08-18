@@ -35,10 +35,13 @@ export class MatchDetails implements OnInit, OnDestroy {
   readonly isLoading = signal<boolean>(true);
   readonly errorMessage = signal<string>('');
   readonly latestUpdate = signal<MatchUpdate | null>(null);
+  readonly updatesHistory = signal<MatchUpdate[]>([]);
+  readonly scorePulse = signal<boolean>(false);
 
   readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
 
   private unbindListeners: Array<() => void> = [];
+  private pulseTimeoutId: any = null;
 
   ngOnInit(): void {
     if (!this.auth.currentUser()) {
@@ -87,13 +90,25 @@ export class MatchDetails implements OnInit, OnDestroy {
           return;
         }
 
-        // console.log('Match update received:', update);
-
         this.latestUpdate.set(update);
+        this.updatesHistory.update((prev) => [update, ...prev].slice(0, 10));
+
+        // Trigger micro-animation for score change
+        this.triggerScorePulse();
       }),
     );
 
     this.realtimeService.connect();
+  }
+
+  private triggerScorePulse(): void {
+    if (this.pulseTimeoutId) {
+      clearTimeout(this.pulseTimeoutId);
+    }
+    this.scorePulse.set(true);
+    this.pulseTimeoutId = setTimeout(() => {
+      this.scorePulse.set(false);
+    }, 1000);
   }
 
   loadMatch(): void {
@@ -122,6 +137,16 @@ export class MatchDetails implements OnInit, OnDestroy {
     if (s.includes('esport') || s.includes('gaming')) return 'fa-solid fa-gamepad';
     if (s.includes('racing') || s.includes('f1')) return 'fa-solid fa-flag-checkered';
     return 'fa-solid fa-trophy';
+  }
+
+  getEventIcon(sport: string | undefined): string {
+    if (!sport) return 'fa-solid fa-bolt';
+    const s = sport.toLowerCase();
+    if (s.includes('football') || s.includes('soccer')) return 'fa-solid fa-futbol';
+    if (s.includes('cricket')) return 'fa-solid fa-baseball-bat-ball';
+    if (s.includes('basket')) return 'fa-solid fa-basketball';
+    if (s.includes('tennis')) return 'fa-solid fa-table-tennis-paddle-ball';
+    return 'fa-solid fa-bolt';
   }
 
   ngOnDestroy(): void {

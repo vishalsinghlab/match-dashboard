@@ -63,15 +63,15 @@
     <div class="live-score-display">
       <div class="team-score-card">
         <span class="team-label">HOME</span>
-        <span class="score-digit">{{ update.score.home }}</span>
+        <span class="score-digit" [class.score-pulse]="scorePulse()">{{ update.score.home }}</span>
       </div>
-      <div class="score-divider">:</div>
+      <div class="score-divider" [class.score-pulse]="scorePulse()">:</div>
       <div class="team-score-card">
         <span class="team-label">AWAY</span>
-        <span class="score-digit">{{ update.score.away }}</span>
+        <span class="score-digit" [class.score-pulse]="scorePulse()">{{ update.score.away }}</span>
       </div>
     </div>
-    <div class="update-ticker">
+    <div class="update-ticker" [class.ticker-pulse]="scorePulse()">
       <span class="dot-live-pulse"></span>
       <span>Last score update at {{ update.timestamp | date:'mediumTime' }}</span>
     </div>
@@ -80,12 +80,15 @@
 
   <!-- Live Feed Grid -->
   <div class="telemetry-grid">
-    <!-- Connection Status Card (Admin Only) -->
+    <!-- Connection Status Card (Admin Only - Visually Demarcated) -->
     @if (isAdmin()) {
-    <div class="telemetry-card">
+    <div class="telemetry-card admin-card">
       <div class="card-head">
-        <i class="fa-solid fa-network-wired"></i>
+        <i class="fa-solid fa-code"></i>
         <h3>WebSocket Channel Specs</h3>
+        <span class="admin-badge">
+          <i class="fa-solid fa-user-shield"></i> ADMIN DEBUG TOOL
+        </span>
       </div>
 
       <div class="status-banner" [class.is-online]="socketConnected()">
@@ -117,7 +120,7 @@
     </div>
     }
 
-    <!-- Broadcast Status / Event Log Card -->
+    <!-- Live Match Feed / Event Timeline Card -->
     <div class="telemetry-card">
       <div class="card-head">
         <i class="fa-solid fa-tower-broadcast"></i>
@@ -125,13 +128,35 @@
       </div>
 
       <div class="stream-state-box">
-        @if (latestUpdate(); as update) {
-        <div class="payload-feed-item">
+        @if (updatesHistory().length > 0) {
+        <div class="feed-timeline-list">
+          @for (update of updatesHistory(); track update.timestamp) {
+          <div class="payload-feed-item" [class.latest-feed-item]="update === latestUpdate()">
+            <div class="feed-header">
+              <div class="feed-event-tag">
+                <i [class]="getEventIcon(m.sport)"></i>
+                <span class="feed-badge">SCORE UPDATE</span>
+              </div>
+              <span class="feed-time">{{ update.timestamp | date:'mediumTime' }}</span>
+            </div>
+            <p class="feed-desc">
+              Current Score: <strong>Home {{ update.score.home }} - {{ update.score.away }} Away</strong>
+            </p>
+          </div>
+          }
+        </div>
+        } @else if (latestUpdate(); as update) {
+        <div class="payload-feed-item latest-feed-item">
           <div class="feed-header">
-            <span class="feed-badge">MATCH UPDATE</span>
+            <div class="feed-event-tag">
+              <i [class]="getEventIcon(m.sport)"></i>
+              <span class="feed-badge">SCORE UPDATE</span>
+            </div>
             <span class="feed-time">{{ update.timestamp | date:'mediumTime' }}</span>
           </div>
-          <p class="feed-desc">Current Score: Home {{ update.score.home }} - {{ update.score.away }} Away</p>
+          <p class="feed-desc">
+            Current Score: <strong>Home {{ update.score.home }} - {{ update.score.away }} Away</strong>
+          </p>
         </div>
         } @else {
         <div class="stream-waiting">
