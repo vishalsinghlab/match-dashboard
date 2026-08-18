@@ -10,14 +10,14 @@
   @if (isLoading()) {
   <div class="state-panel">
     <div class="loading-spinner"></div>
-    <p>Loading sports fixture telemetry...</p>
+    <p>Loading match details...</p>
   </div>
   } @else if (errorMessage()) {
   <div class="error-panel">
     <div class="error-content">
       <i class="fa-solid fa-triangle-exclamation error-icon"></i>
       <div class="error-text">
-        <h4>Fixture Telemetry Unavailable</h4>
+        <h4>Match Details Unavailable</h4>
         <p>{{ errorMessage() }}</p>
       </div>
     </div>
@@ -257,12 +257,12 @@
     @if (m.status === 'LIVE' && latestUpdate(); as update) {
     <div class="update-ticker" [class.ticker-pulse]="scorePulse()">
       <span class="dot-live-pulse"></span>
-      <span>Realtime telemetry sync: {{ update.timestamp | date:'mediumTime' }}</span>
+      <span>Live score sync: {{ update.timestamp | date:'mediumTime' }}</span>
     </div>
     } @else if (m.status === 'UPCOMING') {
     <div class="update-ticker text-upcoming">
       <i class="fa-regular fa-clock"></i>
-      <span>Realtime telemetry stream will initiate automatically upon kickoff</span>
+      <span>Live match updates will stream automatically upon kickoff</span>
     </div>
     }
   </div>
@@ -318,10 +318,6 @@
           <div class="detail-row">
             <span class="detail-label">Status:</span>
             <span class="badge-upcoming">SCHEDULED</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Realtime Channel:</span>
-            <code class="spec-code">match:{{ m._id }}</code>
           </div>
         </div>
       </div>
@@ -537,7 +533,7 @@
       <div class="telemetry-card">
         <div class="card-head">
           <i class="fa-solid fa-tower-broadcast"></i>
-          <h3>Real-Time Telemetry Feed</h3>
+          <h3>Live Match Feed & Event Updates</h3>
         </div>
 
         <div class="stream-state-box">
@@ -566,11 +562,11 @@
           <div class="stream-waiting">
             <i class="fa-solid fa-signal signal-icon"></i>
             @if (m.status === 'LIVE') {
-            <h4>Streaming Live Telemetry...</h4>
-            <p>Score changes and match events will stream live automatically.</p>
+            <h4>Streaming Live Match Updates...</h4>
+            <p>Score changes and key match events will stream live automatically.</p>
             } @else if (m.status === 'UPCOMING') {
             <h4>Fixture Scheduled</h4>
-            <p>Live telemetry stream will initiate automatically upon kickoff.</p>
+            <p>Live match updates will stream automatically upon kickoff.</p>
             } @else {
             <h4>Fixture Concluded</h4>
             <p>Final score verified and archived.</p>
