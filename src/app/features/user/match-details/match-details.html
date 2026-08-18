@@ -335,62 +335,66 @@
 
         <div class="widget-block">
           <h4 class="sub-head">BATSMEN ON CREASE</h4>
-          <table class="sport-table">
-            <thead>
-              <tr>
-                <th>Batter</th>
-                <th>R</th>
-                <th>B</th>
-                <th>4s</th>
-                <th>6s</th>
-                <th>SR</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr [class.highlight-row]="c.striker.isStriker">
-                <td><strong>{{ c.striker.name }}</strong> *</td>
-                <td><strong>{{ c.striker.runs }}</strong></td>
-                <td>{{ c.striker.balls }}</td>
-                <td>{{ c.striker.fours }}</td>
-                <td>{{ c.striker.sixes }}</td>
-                <td>{{ c.striker.strikeRate }}</td>
-              </tr>
-              <tr>
-                <td>{{ c.nonStriker.name }}</td>
-                <td><strong>{{ c.nonStriker.runs }}</strong></td>
-                <td>{{ c.nonStriker.balls }}</td>
-                <td>{{ c.nonStriker.fours }}</td>
-                <td>{{ c.nonStriker.sixes }}</td>
-                <td>{{ c.nonStriker.strikeRate }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="sport-table">
+              <thead>
+                <tr>
+                  <th>Batter</th>
+                  <th>R</th>
+                  <th>B</th>
+                  <th>4s</th>
+                  <th>6s</th>
+                  <th>SR</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr [class.highlight-row]="c.striker.isStriker">
+                  <td><strong>{{ c.striker.name }}</strong> *</td>
+                  <td><strong>{{ c.striker.runs }}</strong></td>
+                  <td>{{ c.striker.balls }}</td>
+                  <td>{{ c.striker.fours }}</td>
+                  <td>{{ c.striker.sixes }}</td>
+                  <td>{{ c.striker.strikeRate }}</td>
+                </tr>
+                <tr>
+                  <td>{{ c.nonStriker.name }}</td>
+                  <td><strong>{{ c.nonStriker.runs }}</strong></td>
+                  <td>{{ c.nonStriker.balls }}</td>
+                  <td>{{ c.nonStriker.fours }}</td>
+                  <td>{{ c.nonStriker.sixes }}</td>
+                  <td>{{ c.nonStriker.strikeRate }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="widget-block">
           <h4 class="sub-head">CURRENT BOWLER</h4>
-          <table class="sport-table">
-            <thead>
-              <tr>
-                <th>Bowler</th>
-                <th>O</th>
-                <th>M</th>
-                <th>R</th>
-                <th>W</th>
-                <th>Econ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>{{ c.bowler.name }}</strong></td>
-                <td>{{ c.bowler.overs }}</td>
-                <td>{{ c.bowler.maidens }}</td>
-                <td>{{ c.bowler.runs }}</td>
-                <td><strong>{{ c.bowler.wickets }}</strong></td>
-                <td>{{ c.bowler.economy }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="sport-table">
+              <thead>
+                <tr>
+                  <th>Bowler</th>
+                  <th>O</th>
+                  <th>M</th>
+                  <th>R</th>
+                  <th>W</th>
+                  <th>Econ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>{{ c.bowler.name }}</strong></td>
+                  <td>{{ c.bowler.overs }}</td>
+                  <td>{{ c.bowler.maidens }}</td>
+                  <td>{{ c.bowler.runs }}</td>
+                  <td><strong>{{ c.bowler.wickets }}</strong></td>
+                  <td>{{ c.bowler.economy }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="cricket-partner-card">
@@ -446,36 +450,38 @@
           <i class="fa-solid fa-basketball"></i>
           <h3>Quarter Scores Breakdown</h3>
         </div>
-        <table class="sport-table matrix-table">
-          <thead>
-            <tr>
-              <th>Team</th>
-              <th>Q1</th>
-              <th>Q2</th>
-              <th>Q3</th>
-              <th>Q4</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>HOME</strong></td>
-              <td>{{ b.q1.home }}</td>
-              <td>{{ b.q2.home }}</td>
-              <td>{{ b.q3.home }}</td>
-              <td>{{ b.q4.home }}</td>
-              <td><strong class="text-accent">{{ homeScore() }}</strong></td>
-            </tr>
-            <tr>
-              <td><strong>AWAY</strong></td>
-              <td>{{ b.q1.away }}</td>
-              <td>{{ b.q2.away }}</td>
-              <td>{{ b.q3.away }}</td>
-              <td>{{ b.q4.away }}</td>
-              <td><strong class="text-accent">{{ awayScore() }}</strong></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="sport-table matrix-table">
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th>Q1</th>
+                <th>Q2</th>
+                <th>Q3</th>
+                <th>Q4</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>HOME</strong></td>
+                <td>{{ b.q1.home }}</td>
+                <td>{{ b.q2.home }}</td>
+                <td>{{ b.q3.home }}</td>
+                <td>{{ b.q4.home }}</td>
+                <td><strong class="text-accent">{{ homeScore() }}</strong></td>
+              </tr>
+              <tr>
+                <td><strong>AWAY</strong></td>
+                <td>{{ b.q1.away }}</td>
+                <td>{{ b.q2.away }}</td>
+                <td>{{ b.q3.away }}</td>
+                <td>{{ b.q4.away }}</td>
+                <td><strong class="text-accent">{{ awayScore() }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       }
 
@@ -735,60 +741,64 @@
       @switch (sportCategory()) {
       @case ('basketball') {
       @let b = basketballData();
-      <table class="sport-table">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Team</th>
-            <th>PTS</th>
-            <th>REB</th>
-            <th>AST</th>
-            <th>MIN</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of b.topPlayers; track p.name) {
-          <tr>
-            <td><strong>{{ p.name }}</strong></td>
-            <td><span class="team-badge" [class.home-team]="p.team === 'home'">{{ p.team | uppercase }}</span></td>
-            <td><strong>{{ p.pts }}</strong></td>
-            <td>{{ p.reb }}</td>
-            <td>{{ p.ast }}</td>
-            <td>{{ p.min }}</td>
-          </tr>
-          }
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="sport-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Team</th>
+              <th>PTS</th>
+              <th>REB</th>
+              <th>AST</th>
+              <th>MIN</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of b.topPlayers; track p.name) {
+            <tr>
+              <td><strong>{{ p.name }}</strong></td>
+              <td><span class="team-badge" [class.home-team]="p.team === 'home'">{{ p.team | uppercase }}</span></td>
+              <td><strong>{{ p.pts }}</strong></td>
+              <td>{{ p.reb }}</td>
+              <td>{{ p.ast }}</td>
+              <td>{{ p.min }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
       }
 
       @case ('esports') {
       @let e = esportsData();
-      <table class="sport-table">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Team</th>
-            <th>K</th>
-            <th>D</th>
-            <th>A</th>
-            <th>ADR</th>
-            <th>HS%</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of e.playerStats; track p.name) {
-          <tr>
-            <td><strong>{{ p.name }}</strong></td>
-            <td><span class="team-badge" [class.home-team]="p.team === 'home'">{{ p.team | uppercase }}</span></td>
-            <td><strong class="text-accent">{{ p.kills }}</strong></td>
-            <td>{{ p.deaths }}</td>
-            <td>{{ p.assists }}</td>
-            <td>{{ p.adr }}</td>
-            <td>{{ p.hsPct }}%</td>
-          </tr>
-          }
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="sport-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Team</th>
+              <th>K</th>
+              <th>D</th>
+              <th>A</th>
+              <th>ADR</th>
+              <th>HS%</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of e.playerStats; track p.name) {
+            <tr>
+              <td><strong>{{ p.name }}</strong></td>
+              <td><span class="team-badge" [class.home-team]="p.team === 'home'">{{ p.team | uppercase }}</span></td>
+              <td><strong class="text-accent">{{ p.kills }}</strong></td>
+              <td>{{ p.deaths }}</td>
+              <td>{{ p.assists }}</td>
+              <td>{{ p.adr }}</td>
+              <td>{{ p.hsPct }}%</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
       }
 
       @default {

@@ -124,12 +124,16 @@
 /* 2-Column Operator Workspace */
 .operator-workspace {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 380px minmax(0, 1fr);
   gap: 20px;
   align-items: start;
+  width: 100%;
+  min-width: 0;
 }
 
 .panel-card {
+  min-width: 0;
+  width: 100%;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -138,6 +142,12 @@
   flex-direction: column;
   gap: 16px;
   box-shadow: var(--shadow-sm);
+}
+
+.feed-panel {
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
 .panel-head {
@@ -834,15 +844,77 @@ input:checked + .toggle-slider::before {
 
 @media (max-width: 768px) {
   .page-container {
-    padding: 16px 16px 32px;
+    padding: 16px 12px 32px;
   }
 
   .page-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-global-specs, .btn-refresh-pipeline {
+    width: 100%;
+    justify-content: center;
   }
 
   .metrics-row {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .toolbar-sm {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .form-row-2col {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-card {
+    padding: 14px;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .modal-card {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-body {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .pill-options {
+    gap: 4px;
+  }
+
+  .pill-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-footer button {
+    width: 100%;
   }
 }

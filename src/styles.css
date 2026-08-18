@@ -350,7 +350,10 @@ a {
 /* High-Density Data Tables */
 .ops-table-container {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
@@ -358,6 +361,7 @@ a {
 
 .ops-table {
   width: 100%;
+  min-width: 580px;
   border-collapse: collapse;
   font-size: 13px;
   text-align: left;
@@ -445,3 +449,43 @@ a {
   color: var(--text-primary);
 }
 
+/* Global Mobile Responsive & Touch Utilities */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-xs);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (max-width: 768px) {
+  .metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .metric-card-elevated {
+    padding: 10px 12px;
+  }
+
+  .metric-val {
+    font-size: 20px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+  }
+}

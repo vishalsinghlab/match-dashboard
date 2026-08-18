@@ -166,3 +166,81 @@
 .app-main-content {
   min-height: calc(100vh - 52px);
 }
+
+/* Mobile Responsive Header Navigation Rules */
+@media (max-width: 768px) {
+  .header-container {
+    padding: 0 12px;
+  }
+
+  .brand-group {
+    gap: 14px;
+  }
+
+  .nav-link {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .header-right {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 540px) {
+  .brand-version {
+    display: none;
+  }
+
+  .brand-name {
+    font-size: 12px;
+    letter-spacing: 0.4px;
+  }
+
+  .brand-group {
+    gap: 10px;
+  }
+
+  .btn-theme-toggle span,
+  .btn-logout span {
+    display: none;
+  }
+
+  .btn-theme-toggle,
+  .btn-logout {
+    padding: 6px;
+    width: 30px;
+    height: 30px;
+    justify-content: center;
+  }
+
+  .nav-link span {
+    font-size: 11px;
+  }
+
+  .nav-link {
+    padding: 4px 6px;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand-name {
+    font-size: 11px;
+  }
+
+  .nav-link span {
+    display: none;
+  }
+
+  .nav-link {
+    padding: 6px;
+    width: 30px;
+    height: 30px;
+    justify-content: center;
+  }
+
+  .nav-link i {
+    font-size: 14px;
+  }
+}

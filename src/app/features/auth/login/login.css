@@ -200,3 +200,17 @@ input::placeholder {
 .demo-chip:hover i {
   color: var(--accent-primary);
 }
+
+@media (max-width: 440px) {
+  .login-wrapper {
+    padding: 16px 12px;
+  }
+
+  .login-card {
+    padding: 16px;
+  }
+
+  .demo-actions {
+    grid-template-columns: 1fr;
+  }
+}

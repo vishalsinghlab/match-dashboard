@@ -624,8 +624,15 @@
   align-items: center;
   gap: 6px;
   border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 2px;
+  padding-bottom: 4px;
   overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tabs-nav-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -641,6 +648,7 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.15s ease;
 }
 
@@ -1298,7 +1306,7 @@
 
 @media (max-width: 768px) {
   .page-container {
-    padding: 16px 16px 32px;
+    padding: 16px 12px 32px;
   }
 
   .scoreboard-hero {
@@ -1307,6 +1315,7 @@
 
   .hero-match-name {
     font-size: 20px;
+    word-break: break-word;
   }
 
   .runs-display {
@@ -1320,5 +1329,109 @@
 
   .telemetry-grid, .lineup-dual-grid, .eco-grid {
     grid-template-columns: 1fr;
+  }
+
+  .tennis-sets-matrix {
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .recent-balls-bar {
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .spec-code {
+    word-break: break-all;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-top {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .upcoming-fixture-card {
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .tennis-team-row {
+    padding: 6px 8px;
+  }
+
+  .player-name {
+    font-size: 12px;
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .set-box {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
+
+  .live-game-point {
+    font-size: 15px;
+    width: 28px;
+  }
+
+  .score-digit {
+    font-size: 32px;
+  }
+
+  .score-divider {
+    font-size: 24px;
+  }
+
+  .error-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .error-panel .btn-secondary {
+    width: 100%;
+  }
+
+  .pitch-container {
+    height: 160px;
+    padding: 8px;
+  }
+
+  .pitch-node {
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+
+  .stat-row {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero-match-name {
+    font-size: 17px;
+  }
+
+  .runs-display {
+    font-size: 28px;
+  }
+
+  .overs-display {
+    font-size: 14px;
+  }
+
+  .tab-btn {
+    padding: 6px 10px;
+    font-size: 11px;
   }
 }
