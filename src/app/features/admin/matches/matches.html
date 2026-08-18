@@ -143,9 +143,11 @@
           <div class="form-field">
             <label for="startTime">Start Date & Time</label>
             <input id="startTime" type="datetime-local" formControlName="startTime"
-              [class.input-error]="matchForm.controls.startTime.touched && matchForm.controls.startTime.invalid" />
+              [class.input-error]="(matchForm.controls.startTime.touched && matchForm.controls.startTime.invalid) || (matchForm.controls.startTime.touched && !!validateStatusAndStartTime())" />
             @if (matchForm.controls.startTime.touched && matchForm.controls.startTime.invalid) {
             <span class="field-error">Start time is required.</span>
+            } @else if (matchForm.controls.startTime.touched && validateStatusAndStartTime(); as dateErr) {
+            <span class="field-error">{{ dateErr }}</span>
             }
           </div>
         </div>

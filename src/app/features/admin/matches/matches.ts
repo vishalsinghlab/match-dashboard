@@ -269,9 +269,43 @@ export class Matches implements OnInit {
     return 'fa-solid fa-trophy';
   }
 
+  validateStatusAndStartTime(): string | null {
+    const status = this.matchForm.controls.status.value;
+    const startTimeStr = this.matchForm.controls.startTime.value;
+    if (!startTimeStr) return null;
+
+    const startDate = new Date(startTimeStr);
+    if (isNaN(startDate.getTime())) return 'Invalid start date & time format.';
+
+    const now = new Date();
+    if (status === 'UPCOMING') {
+      const minAllowed = new Date(now.getTime() - 5 * 60 * 1000);
+      if (startDate < minAllowed) {
+        return 'An UPCOMING fixture must have a start date & time in the present or future.';
+      }
+    } else if (status === 'COMPLETED') {
+      if (startDate > now) {
+        return 'A COMPLETED fixture cannot have a start date & time in the future.';
+      }
+    } else if (status === 'LIVE') {
+      const maxLiveFuture = new Date(now.getTime() + 30 * 60 * 1000);
+      if (startDate > maxLiveFuture) {
+        return 'A LIVE fixture cannot be scheduled far in the future.';
+      }
+    }
+    return null;
+  }
+
   createMatch(): void {
     if (this.matchForm.invalid) {
       this.matchForm.markAllAsTouched();
+      return;
+    }
+
+    const dateValidationError = this.validateStatusAndStartTime();
+    if (dateValidationError) {
+      this.errorMessage.set(dateValidationError);
+      this.matchForm.controls.startTime.markAsTouched();
       return;
     }
 
@@ -295,7 +329,8 @@ export class Matches implements OnInit {
       },
       error: (error) => {
         console.error('Failed to create match:', error);
-        this.errorMessage.set('Failed to create match. Please check inputs and try again.');
+        const serverMsg = error?.error?.message || 'Failed to create match. Please check inputs and try again.';
+        this.errorMessage.set(serverMsg);
         this.isSubmitting.set(false);
       },
     });
